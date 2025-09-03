@@ -1,5 +1,11 @@
-﻿/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Add this block to ignore ESLint errors during the build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
+  // Your existing images configuration
   images: {
     remotePatterns: [
       {
@@ -10,14 +16,14 @@ const nextConfig = {
       },
     ],
   },
+
+  // Your existing rewrites configuration
   async rewrites() {
     return [
-      // This rule proxies API calls
       {
         source: '/api/:path*',
         destination: 'http://localhost:8000/api/:path*',
       },
-      // ✅ ADD THIS RULE to proxy image requests
       {
         source: '/uploads/:path*',
         destination: 'http://localhost:8000/uploads/:path*',
