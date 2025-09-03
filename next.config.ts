@@ -1,7 +1,10 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   // Add this block to ignore ESLint errors during the build
   eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
   
@@ -17,7 +20,7 @@ const nextConfig = {
     ],
   },
 
-  // Your existing rewrites configuration
+  // Your existing rewrites configuration (for local development)
   async rewrites() {
     return [
       {
@@ -32,4 +35,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
