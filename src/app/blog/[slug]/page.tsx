@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image'; // Import the Image component
+import Image from 'next/image';
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -22,10 +22,19 @@ interface Post {
   content: ContentSection[];
 }
 
+// ✅ ADD THIS TYPE DEFINITION for the page's props
+type PageProps = {
+  params: {
+    slug: string;
+  };
+};
+
 // --- DATA FETCHING ---
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    const res = await fetch(`http://localhost:8000/api/posts/slug/${slug}`, { cache: 'no-store' });
+    // Note: This URL will need to be updated to a production URL for deployment
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const res = await fetch(`${apiUrl}/api/posts/slug/${slug}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return res.json();
   } catch (error) {
@@ -35,7 +44,8 @@ async function getPost(slug: string): Promise<Post | null> {
 }
 
 // --- COMPONENT ---
-export default async function SinglePostPage({ params }: { params: { slug: string } }) {
+// ✅ UPDATE THE COMPONENT SIGNATURE to use the new type
+export default async function SinglePostPage({ params }: PageProps) {
   const post = await getPost(params.slug);
 
   if (!post) {
@@ -68,26 +78,22 @@ export default async function SinglePostPage({ params }: { params: { slug: strin
           </div>
         </header>
 
-        {/* Article Content */}
         <article className="prose lg:prose-xl">
-          {/* Render each section from the post's content array */}
           {(post.content || []).map((section, index) => (
             <section key={index} className="mb-8">
               {section.title && <h2>{section.title}</h2>}
               {section.subtitle && <h3 className="text-slate-600">{section.subtitle}</h3>}
               {section.imageUrl && (
-                // Use a div with relative positioning to contain the filled image
                 <div className="relative w-full h-80 rounded-lg my-4 overflow-hidden">
                   <Image
                     src={section.imageUrl}
                     alt={section.title || 'Blog post image'}
-                    fill // This makes the image fill its parent container
-                    style={{ objectFit: 'cover' }} // Retains the object-fit behavior
-                    sizes="(max-width: 768px) 100vw, 33vw" // Add sizes prop for better performance
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
               )}
-              {/* Use ReactMarkdown to render the body text */}
               <ReactMarkdown>{section.body}</ReactMarkdown>
             </section>
           ))}
