@@ -45,7 +45,7 @@ async function getPost(slug: string): Promise<Post | null> {
 
 // --- COMPONENT ---
 // ✅ UPDATE THE COMPONENT SIGNATURE to use the new type
-export default async function SinglePostPage({ params }: PageProps) {
+export default async function SinglePostPage({ params }: any) {
   const post = await getPost(params.slug);
 
   if (!post) {
