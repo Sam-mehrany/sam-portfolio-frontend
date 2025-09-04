@@ -120,8 +120,8 @@ export default function EditPage() {
   // --- DYNAMIC LIST HANDLERS (for Experience, Skills, Education) ---
   const addListItem = (listName: 'experiences' | 'educations' | 'skills.technical' | 'skills.soft' | 'skills.tools') => {
     setContent((prev: PageContent | null) => {
-      if (!prev) return prev;
-      const newContent = JSON.parse(JSON.stringify(prev));
+      if (!prev || typeof prev === 'string') return prev;
+      const newContent = JSON.parse(JSON.stringify(prev)) as AboutPageContent;
       if (listName.startsWith('skills.')) {
         const skillType = listName.split('.')[1] as keyof AboutPageContent['skills'];
         if(!newContent.skills) newContent.skills = { technical: [], soft: [], tools: [] };
@@ -130,7 +130,7 @@ export default function EditPage() {
         const newItem = listName === 'experiences' 
           ? { id: Date.now(), role: '', company: '', period: '', points: '' }
           : { id: Date.now(), degree: '', university: '' };
-        newContent[listName] = [...(newContent[listName] || []), newItem];
+        (newContent[listName] as any) = [...(newContent[listName] as any || []), newItem];
       }
       return newContent;
     });
@@ -138,13 +138,13 @@ export default function EditPage() {
 
   const removeListItem = (listName: 'experiences' | 'educations' | 'skills.technical' | 'skills.soft' | 'skills.tools', indexOrId: number) => {
     setContent((prev: PageContent | null) => {
-      if (!prev) return prev;
-      const newContent = JSON.parse(JSON.stringify(prev));
+      if (!prev || typeof prev === 'string') return prev;
+      const newContent = JSON.parse(JSON.stringify(prev)) as AboutPageContent;
       if (listName.startsWith('skills.')) {
         const skillType = listName.split('.')[1] as keyof AboutPageContent['skills'];
         (newContent.skills[skillType] as string[]).splice(indexOrId, 1);
       } else {
-        (newContent[listName] as Array<{id: number}>) = newContent[listName].filter((item: {id: number}) => item.id !== indexOrId);
+        (newContent[listName] as Array<{id: number}>) = (newContent[listName] as any[]).filter((item: {id: number}) => item.id !== indexOrId);
       }
       return newContent;
     });
@@ -152,14 +152,14 @@ export default function EditPage() {
 
   const handleListItemChange = (listName: 'experiences' | 'educations' | 'skills.technical' | 'skills.soft' | 'skills.tools', indexOrId: number, value: string, field?: string) => {
     setContent((prev: PageContent | null) => {
-      if (!prev) return prev;
-      const newContent = JSON.parse(JSON.stringify(prev));
+      if (!prev || typeof prev === 'string') return prev;
+      const newContent = JSON.parse(JSON.stringify(prev)) as AboutPageContent;
       if (listName.startsWith('skills.')) {
         const skillType = listName.split('.')[1] as keyof AboutPageContent['skills'];
         (newContent.skills[skillType] as string[])[indexOrId] = value;
       } else {
-        const list = newContent[listName];
-        const itemIndex = (list as Array<{id: number}>).findIndex((item) => item.id === indexOrId);
+        const list = newContent[listName] as any[];
+        const itemIndex = list.findIndex((item) => item.id === indexOrId);
         if (itemIndex > -1 && field) {
           list[itemIndex][field] = value;
         }
@@ -169,14 +169,27 @@ export default function EditPage() {
   };
 
   // --- HANDLER for HOME PAGE ---
+  // ✅ CORRECTED THIS FUNCTION
   const handleProjectSelection = (projectId: number) => {
     setContent((prev: PageContent | null) => {
-      if (!prev || typeof prev === 'string') return prev;
-      const selected = (prev as HomePageContent).work?.selectedProjects || [];
-      const newSelection = selected.includes(projectId)
-        ? selected.filter((id: number) => id !== projectId)
-        : [...selected, projectId];
-      return { ...prev, work: { ...prev.work, selectedProjects: newSelection } } as HomePageContent;
+      // Type guard to ensure prev is not null, not a string, and has a 'work' property
+      if (prev && typeof prev === 'object' && 'work' in prev) {
+        const selected = prev.work.selectedProjects || [];
+        const newSelection = selected.includes(projectId)
+          ? selected.filter((id) => id !== projectId)
+          : [...selected, projectId];
+        
+        // Return the updated state, ensuring the 'work' property is correctly structured
+        return { 
+          ...prev, 
+          work: { 
+            ...prev.work, 
+            selectedProjects: newSelection 
+          } 
+        };
+      }
+      // If the condition is not met, return the previous state unchanged
+      return prev;
     });
   };
 
@@ -184,7 +197,6 @@ export default function EditPage() {
   const renderForm = () => {
     if (typeof content !== 'object' || content === null) return <p>Loading form...</p>;
 
-    // ACTION: Render the Homepage Editor
     if (slug === 'home') {
       const homeContent = content as HomePageContent;
       return (
@@ -224,7 +236,6 @@ export default function EditPage() {
       );
     }
     
-    // ACTION: Render the About Me Page Editor
     if (slug === 'about') {
       const aboutContent = content as AboutPageContent;
       return (
@@ -279,7 +290,6 @@ export default function EditPage() {
       );
     }
 
-    // Fallback for other pages (e.g., Contact)
     return (
       <div className="space-y-4">
         <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Page Title" />
