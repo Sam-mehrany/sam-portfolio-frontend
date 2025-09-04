@@ -19,21 +19,25 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      // This URL MUST be relative for the proxy to work
-      const response = await fetch('/api/login', {
+      // ✅ CORRECTED: Build the full URL for the API request
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Invalid username or password.');
+        // Use the error message from the backend if available
+        throw new Error(data.message || 'Invalid username or password.');
       }
 
       router.push('/admin');
 
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "An error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
