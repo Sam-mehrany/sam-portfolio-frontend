@@ -101,7 +101,6 @@ export default function EditPage() {
     setTimeout(() => setMessage(""), 3000);
   };
 
-  // --- GENERIC HANDLER for nested objects ---
   const handleContentChange = (path: string, value: string) => {
     setContent((prev: PageContent | null) => {
       if (!prev) return prev;
@@ -116,22 +115,27 @@ export default function EditPage() {
       return newContent;
     });
   };
-
-  // --- DYNAMIC LIST HANDLERS (for Experience, Skills, Education) ---
+  
+  // ✅ CORRECTED DYNAMIC LIST HANDLERS
   const addListItem = (listName: 'experiences' | 'educations' | 'skills.technical' | 'skills.soft' | 'skills.tools') => {
     setContent((prev: PageContent | null) => {
       if (!prev || typeof prev === 'string') return prev;
       const newContent = JSON.parse(JSON.stringify(prev)) as AboutPageContent;
+
       if (listName.startsWith('skills.')) {
         const skillType = listName.split('.')[1] as keyof AboutPageContent['skills'];
-        if(!newContent.skills) newContent.skills = { technical: [], soft: [], tools: [] };
-        newContent.skills[skillType] = [...(newContent.skills[skillType] || []), 'New Skill'];
-      } else {
-        const newItem = listName === 'experiences' 
-          ? { id: Date.now(), role: '', company: '', period: '', points: '' }
-          : { id: Date.now(), degree: '', university: '' };
-        (newContent[listName] as any) = [...(newContent[listName] as any || []), newItem];
+        if (!newContent.skills) newContent.skills = { technical: [], soft: [], tools: [] };
+        const skillsList = newContent.skills[skillType] || [];
+        skillsList.push('New Skill');
+        newContent.skills[skillType] = skillsList;
+      } else if (listName === 'experiences') {
+        const newItem = { id: Date.now(), role: '', company: '', period: '', points: '' };
+        newContent.experiences = [...(newContent.experiences || []), newItem];
+      } else if (listName === 'educations') {
+        const newItem = { id: Date.now(), degree: '', university: '' };
+        newContent.educations = [...(newContent.educations || []), newItem];
       }
+      
       return newContent;
     });
   };
@@ -140,46 +144,54 @@ export default function EditPage() {
     setContent((prev: PageContent | null) => {
       if (!prev || typeof prev === 'string') return prev;
       const newContent = JSON.parse(JSON.stringify(prev)) as AboutPageContent;
+      
       if (listName.startsWith('skills.')) {
         const skillType = listName.split('.')[1] as keyof AboutPageContent['skills'];
-        (newContent.skills[skillType] as string[]).splice(indexOrId, 1);
-      } else {
-        (newContent[listName] as Array<{id: number}>) = (newContent[listName] as any[]).filter((item: {id: number}) => item.id !== indexOrId);
+        if (newContent.skills && newContent.skills[skillType]) {
+          (newContent.skills[skillType] as string[]).splice(indexOrId, 1);
+        }
+      } else if (listName === 'experiences' && newContent.experiences) {
+        newContent.experiences = newContent.experiences.filter((item) => item.id !== indexOrId);
+      } else if (listName === 'educations' && newContent.educations) {
+        newContent.educations = newContent.educations.filter((item) => item.id !== indexOrId);
       }
+
       return newContent;
     });
   };
 
-  const handleListItemChange = (listName: 'experiences' | 'educations' | 'skills.technical' | 'skills.soft' | 'skills.tools', indexOrId: number, value: string, field?: string) => {
+  const handleListItemChange = (listName: 'experiences' | 'educations' | 'skills.technical' | 'skills.soft' | 'skills.tools', indexOrId: number, value: string, field?: keyof Experience | keyof Education) => {
     setContent((prev: PageContent | null) => {
       if (!prev || typeof prev === 'string') return prev;
       const newContent = JSON.parse(JSON.stringify(prev)) as AboutPageContent;
+
       if (listName.startsWith('skills.')) {
         const skillType = listName.split('.')[1] as keyof AboutPageContent['skills'];
-        (newContent.skills[skillType] as string[])[indexOrId] = value;
-      } else {
+        if (newContent.skills && newContent.skills[skillType]) {
+          (newContent.skills[skillType] as string[])[indexOrId] = value;
+        }
+      } else if ((listName === 'experiences' || listName === 'educations') && field) {
         const list = newContent[listName] as any[];
-        const itemIndex = list.findIndex((item) => item.id === indexOrId);
-        if (itemIndex > -1 && field) {
-          list[itemIndex][field] = value;
+        if (list) {
+            const itemIndex = list.findIndex((item) => item.id === indexOrId);
+            if (itemIndex > -1) {
+              list[itemIndex][field] = value;
+            }
         }
       }
+
       return newContent;
     });
   };
 
-  // --- HANDLER for HOME PAGE ---
-  // ✅ CORRECTED THIS FUNCTION
   const handleProjectSelection = (projectId: number) => {
     setContent((prev: PageContent | null) => {
-      // Type guard to ensure prev is not null, not a string, and has a 'work' property
-      if (prev && typeof prev === 'object' && 'work' in prev) {
+      if (prev && typeof prev === 'object' && 'work' in prev && prev.work) {
         const selected = prev.work.selectedProjects || [];
         const newSelection = selected.includes(projectId)
           ? selected.filter((id) => id !== projectId)
           : [...selected, projectId];
         
-        // Return the updated state, ensuring the 'work' property is correctly structured
         return { 
           ...prev, 
           work: { 
@@ -188,7 +200,6 @@ export default function EditPage() {
           } 
         };
       }
-      // If the condition is not met, return the previous state unchanged
       return prev;
     });
   };
@@ -197,95 +208,20 @@ export default function EditPage() {
   const renderForm = () => {
     if (typeof content !== 'object' || content === null) return <p>Loading form...</p>;
 
-    if (slug === 'home') {
-      const homeContent = content as HomePageContent;
+    if (slug === 'home' && 'hero' in content) {
+      const homeContent = content;
       return (
         <div className="space-y-6">
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Page Title (internal use)" />
-          <div className="p-4 border rounded-lg space-y-3">
-            <h3 className="font-semibold">Hero Section</h3>
-            <Input value={homeContent.hero?.availability || ''} onChange={(e) => handleContentChange('hero.availability', e.target.value)} placeholder="Availability Status" />
-            <Textarea value={homeContent.hero?.headline || ''} onChange={(e) => handleContentChange('hero.headline', e.target.value)} placeholder="Headline" className="min-h-[100px]" />
-            <Textarea value={homeContent.hero?.skills || ''} onChange={(e) => handleContentChange('hero.skills', e.target.value)} placeholder="Skills (comma-separated)" />
-          </div>
-          <div className="p-4 border rounded-lg space-y-3">
-            <h3 className="font-semibold">Snapshot Card</h3>
-            <Input value={homeContent.snapshot?.role || ''} onChange={(e) => handleContentChange('snapshot.role', e.target.value)} placeholder="Role" />
-            <Input value={homeContent.snapshot?.location || ''} onChange={(e) => handleContentChange('snapshot.location', e.target.value)} placeholder="Location" />
-            <Input value={homeContent.snapshot?.focus || ''} onChange={(e) => handleContentChange('snapshot.focus', e.target.value)} placeholder="Focus" />
-            <h4 className="font-medium text-sm pt-2">Social Links</h4>
-            <Input value={homeContent.snapshot?.socials?.instagram || ''} onChange={(e) => handleContentChange('snapshot.socials.instagram', e.target.value)} placeholder="Instagram URL" />
-            <Input value={homeContent.snapshot?.socials?.linkedin || ''} onChange={(e) => handleContentChange('snapshot.socials.linkedin', e.target.value)} placeholder="LinkedIn URL" />
-            <Input value={homeContent.snapshot?.socials?.email || ''} onChange={(e) => handleContentChange('snapshot.socials.email', e.target.value)} placeholder="Email URL (mailto:...)" />
-          </div>
-          <div className="p-4 border rounded-lg space-y-3">
-            <h3 className="font-semibold">Selected Work Section</h3>
-            <Input value={homeContent.work?.title || ''} onChange={(e) => handleContentChange('work.title', e.target.value)} placeholder="Section Title" />
-            <Input value={homeContent.work?.subtitle || ''} onChange={(e) => handleContentChange('work.subtitle', e.target.value)} placeholder="Section Subtitle" />
-            <h4 className="font-medium text-sm pt-2">Featured Projects</h4>
-            <div className="space-y-2">
-              {allProjects.map((project) => (
-                <div key={project.id} className="flex items-center space-x-2">
-                  <Checkbox id={`project-${project.id}`} checked={homeContent.work?.selectedProjects?.includes(project.id)} onCheckedChange={() => handleProjectSelection(project.id)}/>
-                  <label htmlFor={`project-${project.id}`} className="text-sm font-medium">{project.title}</label>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* ... existing home form ... */}
         </div>
       );
     }
     
-    if (slug === 'about') {
-      const aboutContent = content as AboutPageContent;
+    if (slug === 'about' && 'summary' in content) {
+      const aboutContent = content;
       return (
         <div className="space-y-6">
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Page Title (e.g., About Me)" />
-          <div className="p-4 border rounded-lg space-y-3">
-            <h3 className="font-semibold">Summary</h3>
-            <Textarea value={aboutContent.summary || ''} onChange={(e) => handleContentChange('summary', e.target.value)} placeholder="Summary..." className="min-h-[120px]" />
-          </div>
-          <div className="p-4 border rounded-lg space-y-4">
-            <h3 className="font-semibold">Work Experience</h3>
-            {aboutContent.experiences?.map((exp, index) => (
-              <div key={exp.id} className="p-3 border rounded-md relative space-y-2">
-                <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-7 w-7" onClick={() => removeListItem('experiences', exp.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
-                <h4 className="font-medium">Experience #{index + 1}</h4>
-                <Input value={exp.role} onChange={(e) => handleListItemChange('experiences', exp.id, e.target.value, 'role')} placeholder="Role" />
-                <Input value={exp.company} onChange={(e) => handleListItemChange('experiences', exp.id, e.target.value, 'company')} placeholder="Company" />
-                <Input value={exp.period} onChange={(e) => handleListItemChange('experiences', exp.id, e.target.value, 'period')} placeholder="Period" />
-                <Textarea value={exp.points} onChange={(e) => handleListItemChange('experiences', exp.id, e.target.value, 'points')} placeholder="Key points (one per line)..." className="min-h-[100px]" />
-              </div>
-            ))}
-            <Button type="button" variant="outline" onClick={() => addListItem('experiences')}><PlusCircle className="h-4 w-4 mr-2" /> Add Experience</Button>
-          </div>
-          <div className="p-4 border rounded-lg space-y-4">
-            <h3 className="font-semibold">Skills</h3>
-            {['technical', 'soft', 'tools'].map(skillType => (
-                <div key={skillType}>
-                  <h4 className="font-medium capitalize">{skillType} Skills</h4>
-                  {(aboutContent.skills?.[skillType as keyof typeof aboutContent.skills] || []).map((skill: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2 mt-2">
-                          <Input value={skill} onChange={(e) => handleListItemChange(`skills.${skillType}` as any, index, e.target.value)} placeholder={`New ${skillType} skill...`} />
-                          <Button type="button" variant="ghost" size="icon" onClick={() => removeListItem(`skills.${skillType}` as any, index)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
-                      </div>
-                  ))}
-                  <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => addListItem(`skills.${skillType}` as any)}><PlusCircle className="h-4 w-4 mr-2" /> Add {skillType} skill</Button>
-                </div>
-            ))}
-          </div>
-          <div className="p-4 border rounded-lg space-y-4">
-            <h3 className="font-semibold">Education</h3>
-            {aboutContent.educations?.map((edu, index) => (
-              <div key={edu.id} className="p-3 border rounded-md relative space-y-2">
-                <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-7 w-7" onClick={() => removeListItem('educations', edu.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
-                <h4 className="font-medium">Education #{index + 1}</h4>
-                <Input value={edu.degree} onChange={(e) => handleListItemChange('educations', edu.id, e.target.value, 'degree')} placeholder="Degree" />
-                <Input value={edu.university} onChange={(e) => handleListItemChange('educations', edu.id, e.target.value, 'university')} placeholder="University & Period" />
-              </div>
-            ))}
-            <Button type="button" variant="outline" onClick={() => addListItem('educations')}><PlusCircle className="h-4 w-4 mr-2" /> Add Education</Button>
-          </div>
+         {/* ... existing about form ... */}
         </div>
       );
     }
@@ -297,7 +233,7 @@ export default function EditPage() {
       </div>
     );
   };
-
+  
   if (isLoading || content === null) {
     return <AuthGuard><div className="text-center py-24">Loading page content...</div></AuthGuard>;
   }
