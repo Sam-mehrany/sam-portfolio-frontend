@@ -10,8 +10,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        // This MUST be the relative path for the proxy to work.
-        const response = await fetch('/api/verify', { credentials: 'include' });
+        // ✅ CORRECTED: Build the full URL for the API request
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const response = await fetch(`${apiUrl}/api/verify`, { credentials: 'include' });
 
         if (response.ok) {
           setStatus('authenticated');
