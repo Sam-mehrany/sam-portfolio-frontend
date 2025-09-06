@@ -56,6 +56,7 @@ export default function EditPage() {
           if (pageRes.ok) {
             const data = await pageRes.json();
             setTitle(data.title);
+            
             // ✅ CORRECTED: Parse the content string into an object
             const parsedContent = typeof data.content === 'string' 
               ? JSON.parse(data.content) 
@@ -74,6 +75,8 @@ export default function EditPage() {
       fetchData();
     }
   }, [slug]);
+
+  // ... (The rest of your code remains exactly the same) ...
 
   const handleLogout = async () => {
     await fetch('/api/logout', { method: 'POST', credentials: 'include' });
@@ -215,7 +218,7 @@ export default function EditPage() {
       const homeContent = content;
       return (
         <div className="space-y-6">
-         {/* ... Your existing home form JSX ... */}
+          {/* ... (Your existing JSX for the home form) ... */}
         </div>
       );
     }
@@ -224,7 +227,7 @@ export default function EditPage() {
       const aboutContent = content;
       return (
         <div className="space-y-6">
-         {/* ... Your existing about form JSX ... */}
+         {/* ... (Your existing JSX for the about form) ... */}
         </div>
       );
     }
