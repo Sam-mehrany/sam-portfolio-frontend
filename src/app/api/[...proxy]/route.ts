@@ -16,6 +16,7 @@ async function handler(req: NextRequest) {
         },
         body: req.body,
         redirect: 'manual',
+        duplex: 'half' // ✅ ADD THIS LINE
     });
 
     const headers = new Headers();
