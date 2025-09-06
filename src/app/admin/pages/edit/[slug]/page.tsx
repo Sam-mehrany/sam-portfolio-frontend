@@ -56,7 +56,11 @@ export default function EditPage() {
           if (pageRes.ok) {
             const data = await pageRes.json();
             setTitle(data.title);
-            setContent(data.content);
+            // ✅ CORRECTED: Parse the content string into an object
+            const parsedContent = typeof data.content === 'string' 
+              ? JSON.parse(data.content) 
+              : data.content;
+            setContent(parsedContent);
           }
           if (projectsRes.ok) setAllProjects(await projectsRes.json());
         } catch (error: unknown) {
@@ -116,7 +120,6 @@ export default function EditPage() {
     });
   };
   
-  // ✅ CORRECTED DYNAMIC LIST HANDLERS
   const addListItem = (listName: 'experiences' | 'educations' | 'skills.technical' | 'skills.soft' | 'skills.tools') => {
     setContent((prev: PageContent | null) => {
       if (!prev || typeof prev === 'string') return prev;
@@ -212,7 +215,7 @@ export default function EditPage() {
       const homeContent = content;
       return (
         <div className="space-y-6">
-          {/* ... existing home form ... */}
+         {/* ... Your existing home form JSX ... */}
         </div>
       );
     }
@@ -221,7 +224,7 @@ export default function EditPage() {
       const aboutContent = content;
       return (
         <div className="space-y-6">
-         {/* ... existing about form ... */}
+         {/* ... Your existing about form JSX ... */}
         </div>
       );
     }
