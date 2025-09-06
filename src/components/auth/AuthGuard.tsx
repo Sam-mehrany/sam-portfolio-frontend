@@ -11,7 +11,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const verifyToken = async () => {
       try {
         const response = await fetch('/api/verify', {
-          credentials: 'include'
+          credentials: 'include' // Important for sending cookies
         });
 
         if (response.ok) {
