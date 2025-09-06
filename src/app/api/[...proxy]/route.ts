@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// This function will handle all requests to /api/*
 async function handler(req: NextRequest) {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!backendUrl) {
         return NextResponse.json({ error: 'Backend URL not configured' }, { status: 500 });
     }
 
-    // Reconstruct the target URL to the real backend
-    const path = req.nextUrl.pathname; // This will be /api/login, /api/verify, etc.
-    const targetUrl = `${backendUrl}${path}`;
+    const targetUrl = `${backendUrl}${req.nextUrl.pathname}`;
 
-    // Forward the request, including the body and cookies
     const response = await fetch(targetUrl, {
         method: req.method,
         headers: {
@@ -22,8 +18,6 @@ async function handler(req: NextRequest) {
         redirect: 'manual',
     });
 
-    // Create a new response and copy the headers from the backend
-    // This is crucial for passing the 'Set-Cookie' header back to the browser
     const headers = new Headers();
     response.headers.forEach((value, key) => {
         if (key.toLowerCase() === 'set-cookie') {
