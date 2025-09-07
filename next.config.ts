@@ -1,12 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  eslint: {
-    // Ignore ESLint errors during the build
-    ignoreDuringBuilds: true,
-  },
+  // This allows Next.js to optimize images served from your backend
   images: {
-    // Allow images hosted by the backend
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,15 +11,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  
+  // This proxies all API and upload requests to your live backend
   async rewrites() {
     return [
       {
-        // Proxy API requests to the backend app
         source: '/api/:path*',
         destination: 'https://sam-portfolio-backend.liara.run/api/:path*',
       },
       {
-        // Proxy uploads access to the backend app
         source: '/uploads/:path*',
         destination: 'https://sam-portfolio-backend.liara.run/uploads/:path*',
       },
