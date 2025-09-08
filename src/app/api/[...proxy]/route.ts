@@ -8,16 +8,18 @@ async function handler(req: NextRequest) {
 
     const targetUrl = `${backendUrl}${req.nextUrl.pathname}`;
 
-    // Create new headers and forward the essential ones
+    // Create new headers, but forward the essential ones
     const headers = new Headers();
     headers.set('Cookie', req.headers.get('cookie') || '');
 
-    // Conditionally set Content-Type
-    // For file uploads, we let the browser set the correct multipart header.
-    // Otherwise, we assume JSON.
+    // ✅ CORRECTED: Conditionally set Content-Type
+    // For file uploads, forward the original multipart header.
+    // Otherwise, assume JSON.
     const contentType = req.headers.get('content-type');
-    if (!contentType || !contentType.includes('multipart/form-data')) {
-      headers.set('Content-Type', 'application/json');
+    if (contentType && contentType.includes('multipart/form-data')) {
+        // Let fetch set the correct multipart boundary
+    } else {
+        headers.set('Content-Type', 'application/json');
     }
 
     const response = await fetch(targetUrl, {
@@ -25,7 +27,7 @@ async function handler(req: NextRequest) {
         headers: headers, // Pass the corrected headers
         body: req.body,
         redirect: 'manual',
-        // @ts-ignore - duplex is required for streaming bodies in newer Node versions
+        // @ts-ignore
         duplex: 'half'
     });
 
