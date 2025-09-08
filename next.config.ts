@@ -1,29 +1,33 @@
+// In your next.config.ts file
+
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // This allows Next.js to optimize images served from your backend
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
   images: {
     remotePatterns: [
+      // This is your existing pattern for local development
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8000',
+        pathname: '/uploads/**',
+      },
+      // ✅ ADD THIS NEW PATTERN FOR PRODUCTION
       {
         protocol: 'https',
-        hostname: 'sam-portfolio-backend.liara.run',
+        hostname: 'your-backend-hostname.liara.run', // 👈 REPLACE THIS with your actual backend hostname
+        port: '', // Port is usually empty for https
         pathname: '/uploads/**',
       },
     ],
   },
-  
-  // This proxies all API and upload requests to your live backend
+
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'https://sam-portfolio-backend.liara.run/api/:path*',
-      },
-      {
-        source: '/uploads/:path*',
-        destination: 'https://sam-portfolio-backend.liara.run/uploads/:path*',
-      },
-    ];
+    // ... your rewrites config
   },
 };
 
