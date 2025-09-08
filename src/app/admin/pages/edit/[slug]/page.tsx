@@ -57,7 +57,6 @@ export default function EditPage() {
             const data = await pageRes.json();
             setTitle(data.title);
             
-            // ✅ CORRECTED: Parse the content string into an object
             const parsedContent = typeof data.content === 'string' 
               ? JSON.parse(data.content) 
               : data.content;
@@ -75,8 +74,6 @@ export default function EditPage() {
       fetchData();
     }
   }, [slug]);
-
-  // ... (The rest of your code remains exactly the same) ...
 
   const handleLogout = async () => {
     await fetch('/api/logout', { method: 'POST', credentials: 'include' });
@@ -212,30 +209,24 @@ export default function EditPage() {
 
   // --- RENDER LOGIC ---
   const renderForm = () => {
+    // ✅ ADDED THIS LINE FOR DEBUGGING
+    console.log("Rendering form with content:", content);
+
     if (typeof content !== 'object' || content === null) return <p>Loading form...</p>;
 
     if (slug === 'home' && 'hero' in content) {
       const homeContent = content;
-      return (
-        <div className="space-y-6">
-          {/* ... (Your existing JSX for the home form) ... */}
-        </div>
-      );
+      // ... Your existing JSX for the home form ...
     }
     
     if (slug === 'about' && 'summary' in content) {
       const aboutContent = content;
-      return (
-        <div className="space-y-6">
-         {/* ... (Your existing JSX for the about form) ... */}
-        </div>
-      );
+      // ... Your existing JSX for the about form ...
     }
 
     return (
       <div className="space-y-4">
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Page Title" />
-        <Textarea value={typeof content === 'string' ? content : ''} onChange={(e) => setContent(e.target.value)} className="min-h-[400px]" placeholder="Page content (Markdown)..." />
+        {/* ... Your existing fallback form JSX ... */}
       </div>
     );
   };
@@ -247,24 +238,7 @@ export default function EditPage() {
   return (
     <AuthGuard>
       <main className="min-h-screen bg-slate-100">
-        <div className="max-w-3xl mx-auto px-6 py-16">
-          <header className="mb-8">
-            <div className="flex items-center justify-between">
-              <h1 className="text-4xl font-bold capitalize">Edit {slug} Page</h1>
-              <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout"><LogOut className="h-4 w-4" /></Button>
-            </div>
-            <Link href="/admin/pages" className="text-sm text-blue-500 hover:underline">← Back to All Pages</Link>
-          </header>
-          <Card>
-            <CardContent className="pt-6">
-              <form onSubmit={handleSubmit}>
-                {renderForm()}
-                <Button type="submit" className="mt-6">Save Changes</Button>
-              </form>
-              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>{message}</p>}
-            </CardContent>
-          </Card>
-        </div>
+        {/* ... Your existing main page JSX ... */}
       </main>
     </AuthGuard>
   );
