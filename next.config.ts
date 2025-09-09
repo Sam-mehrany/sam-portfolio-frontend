@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
         port: '8000',
         pathname: '/uploads/**',
       },
-      // ✅ ADD THIS NEW PATTERN FOR PRODUCTION
+      // This is the pattern for production
       {
         protocol: 'https',
         hostname: 'your-backend-hostname.liara.run', // 👈 REPLACE THIS with your actual backend hostname
@@ -26,8 +26,19 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // ✅ FIX: This function now returns your proxy configuration for local development.
+  // This resolves the build error and keeps your local setup working.
   async rewrites() {
-    // ... your rewrites config
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:8000/api/:path*',
+      },
+      {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:8000/uploads/:path*',
+      },
+    ]
   },
 };
 
