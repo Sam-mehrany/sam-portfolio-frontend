@@ -24,7 +24,6 @@ interface HomePageContent {
   work: { title: string; subtitle: string; selectedProjects: number[] };
 }
 
-// ACTION: Updated the Project interface to include the thumbnail
 interface Project {
   id: number;
   slug: string;
@@ -39,11 +38,13 @@ export default function Portfolio() {
   // --- STATE MANAGEMENT ---
   const [content, setContent] = useState<HomePageContent | null>(null);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectDescription, setProjectDescription] = useState("");
   const [contactInfo, setContactInfo] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  // ✅ Get the backend URL from your environment variables
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL;
 
   // --- DATA FETCHING ---
   useEffect(() => {
@@ -86,20 +87,16 @@ export default function Portfolio() {
       alert("Please provide your contact information.");
       return;
     }
-
     try {
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ projectDescription, contactInfo }),
       });
-
       if (!response.ok) {
         throw new Error("Failed to submit message.");
       }
-
       setIsSubmitted(true);
-
       setTimeout(() => {
         setIsModalOpen(false);
         setTimeout(() => {
@@ -108,7 +105,6 @@ export default function Portfolio() {
           setContactInfo("");
         }, 500);
       }, 2000);
-
     } catch (error) {
       console.error("Submission error:", error);
       alert("There was an error submitting your request. Please try again.");
@@ -176,45 +172,49 @@ export default function Portfolio() {
         <p className="text-slate-600 mt-2">{content?.work?.subtitle}</p>
 
         <div className="grid md:grid-cols-2 gap-6 mt-6">
-          {featuredProjects.length > 0 ? featuredProjects.map((p) => (
-            <Link href={`/projects/${p.slug}`} key={p.slug} className="group">
-              <Card className="p-0 rounded-lg hover:shadow-xl transition-shadow h-full flex flex-col overflow-hidden">
-                {/* Use a div with relative positioning to contain the filled image */}
-                <div className="relative aspect-[16/9] bg-slate-100">
-                  {p.thumbnail ? (
-                    <Image
-                      src={p.thumbnail}
-                      alt={`${p.title} thumbnail`}
-                      fill // This makes the image fill its parent container
-                      style={{ objectFit: 'cover' }} // Retains the object-fit behavior
-                      className="group-hover:scale-105 transition-transform duration-300" // Add className to the Image component
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-col flex-grow p-4">
-                  <CardHeader className="p-0">
-                    <CardTitle className="flex items-center justify-between group-hover:text-blue-600 transition-colors">
-                      <span>{p.title}</span>
-                      <span className="text-sm font-normal text-slate-500">{p.year}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0 pt-4 flex-grow">
-                    <p className="text-slate-700">{p.blurb}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {(p.tags || []).map((t) => (
-                        <Badge key={t} variant="secondary" className="rounded-full">{t}</Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </div>
-              </Card>
-            </Link>
-          )) : <p className="text-slate-500 md:col-span-2">No featured projects have been selected yet.</p>}
+          {featuredProjects.length > 0 ? featuredProjects.map((p) => {
+            // ✅ Construct the full, absolute URL for the thumbnail
+            const thumbnailUrl = p.thumbnail ? `${backendUrl}${p.thumbnail}` : null;
+            
+            return (
+              <Link href={`/projects/${p.slug}`} key={p.slug} className="group">
+                <Card className="p-0 rounded-lg hover:shadow-xl transition-shadow h-full flex flex-col overflow-hidden">
+                  <div className="relative aspect-[16/9] bg-slate-100">
+                    {thumbnailUrl ? (
+                      <Image
+                        src={thumbnailUrl}
+                        alt={`${p.title} thumbnail`}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
+                        No Image
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col flex-grow p-4">
+                    <CardHeader className="p-0">
+                      <CardTitle className="flex items-center justify-between group-hover:text-blue-600 transition-colors">
+                        <span>{p.title}</span>
+                        <span className="text-sm font-normal text-slate-500">{p.year}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0 pt-4 flex-grow">
+                      <p className="text-slate-700">{p.blurb}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {(p.tags || []).map((t) => (
+                          <Badge key={t} variant="secondary" className="rounded-full">{t}</Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </div>
+                </Card>
+              </Link>
+            );
+          }) : <p className="text-slate-500 md:col-span-2">No featured projects have been selected yet.</p>}
         </div>
         <div className="mt-8">
           <Link href="/projects"><Button>View All Projects</Button></Link>
