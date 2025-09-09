@@ -1,5 +1,3 @@
-// In your next.config.ts file
-
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -9,17 +7,15 @@ const nextConfig: NextConfig = {
   
   images: {
     remotePatterns: [
-      // Pattern for local development
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '8000',
         pathname: '/uploads/**',
       },
-      // ✅ FIX: Use your actual backend hostname here
       {
         protocol: 'https',
-        hostname: 'sam-portfolio-backend.liara.run',
+        hostname: 'sam-portfolio-backend.liara.run', // Make sure this is exactly correct
         port: '',
         pathname: '/uploads/**',
       },
