@@ -9,25 +9,23 @@ const nextConfig: NextConfig = {
   
   images: {
     remotePatterns: [
-      // This is your existing pattern for local development
+      // Pattern for local development
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '8000',
         pathname: '/uploads/**',
       },
-      // This is the pattern for production
+      // ✅ FIX: Use your actual backend hostname here
       {
         protocol: 'https',
-        hostname: 'your-backend-hostname.liara.run', // 👈 REPLACE THIS with your actual backend hostname
-        port: '', // Port is usually empty for https
+        hostname: 'sam-portfolio-backend.liara.run',
+        port: '',
         pathname: '/uploads/**',
       },
     ],
   },
 
-  // ✅ FIX: This function now returns your proxy configuration for local development.
-  // This resolves the build error and keeps your local setup working.
   async rewrites() {
     return [
       {
