@@ -43,8 +43,8 @@ export default function Portfolio() {
   const [contactInfo, setContactInfo] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   
-  // ✅ Get the backend URL from your environment variables
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL;
+  // ✅ Get the backend URL from your environment variables, with a fallback
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sam-portfolio-backend.liara.run';
 
   // --- DATA FETCHING ---
   useEffect(() => {
@@ -173,8 +173,12 @@ export default function Portfolio() {
 
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           {featuredProjects.length > 0 ? featuredProjects.map((p) => {
-            // ✅ Construct the full, absolute URL for the thumbnail
-            const thumbnailUrl = p.thumbnail ? `${backendUrl}${p.thumbnail}` : null;
+            // ✅ Construct the full, absolute URL for the thumbnail correctly
+            const thumbnailUrl = p.thumbnail 
+              ? (p.thumbnail.startsWith('http') 
+                  ? p.thumbnail 
+                  : `${backendUrl}${p.thumbnail}`)
+              : null;
             
             return (
               <Link href={`/projects/${p.slug}`} key={p.slug} className="group">
@@ -188,6 +192,10 @@ export default function Portfolio() {
                         style={{ objectFit: 'cover' }}
                         className="group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 100vw, 50vw"
+                        // ✅ Add these props to help with loading issues
+                        priority={false}
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
