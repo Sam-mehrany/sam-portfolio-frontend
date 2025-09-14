@@ -117,6 +117,38 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
+  
+  /* Additional dark mode utilities for your custom components */
+  .gradient-bg {
+    @apply bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800;
+  }
+  
+  .text-primary {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+  
+  .text-secondary {
+    @apply text-slate-600 dark:text-slate-400;
+  }
+  
+  .text-muted {
+    @apply text-slate-500 dark:text-slate-500;
+  }
+  
+  .bg-card-custom {
+    @apply bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700;
+  }
+  
+  .bg-input-custom {
+    @apply bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600;
+  }
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
