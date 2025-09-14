@@ -15,7 +15,9 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-// ... (Your interfaces can stay the same)
+// Backend URL for direct image access
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sam-portfolio-backend.liara.run';
+
 interface ContentSection {
   title: string;
   subtitle: string;
@@ -37,7 +39,6 @@ interface ProjectDetails {
   content: ContentSection[];
 }
 
-
 export default function SingleProjectPage() {
   const params = useParams();
   const slug = params.slug;
@@ -51,7 +52,8 @@ export default function SingleProjectPage() {
     if (slug) {
       const fetchProject = async () => {
         try {
-          const response = await fetch(`http://localhost:8000/api/projects/slug/${slug}`);
+          // Use the same API approach as the projects listing page
+          const response = await fetch(`/api/projects/slug/${slug}`);
           if (!response.ok) throw new Error('Could not find this project.');
           const data = await response.json();
           setProject(data);
@@ -82,7 +84,6 @@ export default function SingleProjectPage() {
   return (
     <>
       <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
-        {/* ... (Your header and carousel JSX can stay the same) ... */}
         <div className="max-w-4xl mx-auto px-6 pt-16">
           <header className="mb-12">
             <Link href="/projects" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4">
@@ -101,17 +102,27 @@ export default function SingleProjectPage() {
           <div className="w-full mb-12">
             <Carousel className="w-full" opts={{ align: "start", loop: true }}>
               <CarouselContent className="-ml-4">
-                {(project.images || []).map((imageSrc, index) => (
-                  <CarouselItem key={index} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                    <div className="cursor-pointer" onClick={() => setLightboxImage(`http://localhost:8000${imageSrc}`)}>
-                      <img 
-                        src={`http://localhost:8000${imageSrc}`}
-                        alt={`Project image ${index + 1} for ${project.title}`}
-                        className="w-full h-auto object-cover rounded-lg"
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
+                {(project.images || []).map((imageSrc, index) => {
+                  const fullImageUrl = imageSrc.startsWith('http') 
+                    ? imageSrc 
+                    : `${backendUrl}${imageSrc}`;
+                  
+                  return (
+                    <CarouselItem key={index} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                      <div className="cursor-pointer" onClick={() => setLightboxImage(fullImageUrl)}>
+                        <img 
+                          src={fullImageUrl}
+                          alt={`Project image ${index + 1} for ${project.title}`}
+                          className="w-full h-auto object-cover rounded-lg"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = '/placeholder-image.png'; // Fallback image
+                          }}
+                        />
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
               </CarouselContent>
               <CarouselPrevious className="ml-16"/>
               <CarouselNext className="mr-16"/>
@@ -148,19 +159,28 @@ export default function SingleProjectPage() {
 
           {/* Dynamic sections */}
           {(project.content || []).map((section, index) => {
-            // ACTION: Added this console.log for debugging
             console.log(`Rendering Section ${index + 1}:`, section);
+
+            const sectionImageUrl = section.imageUrl 
+              ? (section.imageUrl.startsWith('http') 
+                  ? section.imageUrl 
+                  : `${backendUrl}${section.imageUrl}`)
+              : null;
 
             return (
               <section key={index}>
                 {section.title && <h2 className="text-3xl font-bold mb-2">{section.title}</h2>}
                 {section.subtitle && <h3 className="text-xl text-slate-600 font-semibold mb-4">{section.subtitle}</h3>}
-                {section.imageUrl && (
+                {sectionImageUrl && (
                   <img 
-                    src={`http://localhost:8000${section.imageUrl}`}
+                    src={sectionImageUrl}
                     alt={section.title || 'Section image'}
                     className="rounded-lg my-4 w-full h-auto cursor-pointer"
-                    onClick={() => setLightboxImage(`http://localhost:8000${section.imageUrl}`)}
+                    onClick={() => setLightboxImage(sectionImageUrl)}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
                   />
                 )}
                 <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">{section.body}</p>
