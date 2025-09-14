@@ -1,7 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import Image from "next/image";
+// Remove Next.js Image import - we'll use regular img tags
+// import Image from "next/image";
+
+// Backend URL for direct image access
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sam-portfolio-backend.liara.run';
 
 // --- TYPE DEFINITION ---
 interface Project {
