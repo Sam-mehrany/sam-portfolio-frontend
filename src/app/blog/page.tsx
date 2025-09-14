@@ -48,16 +48,16 @@ export default function BlogListPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-100">
         <div className="max-w-4xl mx-auto px-6 py-16">
           <header className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight">Blog & Articles</h1>
-            <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               Thoughts on design, technology, and creative strategy.
             </p>
           </header>
           <div className="text-center">
-            <p className="text-slate-500">Loading blog posts...</p>
+            <p className="text-slate-500 dark:text-slate-400">Loading blog posts...</p>
           </div>
         </div>
       </main>
@@ -65,11 +65,11 @@ export default function BlogListPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+    <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-100">
       <div className="max-w-4xl mx-auto px-6 py-16">
         <header className="text-center mb-12">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight">Blog & Articles</h1>
-          <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Thoughts on design, technology, and creative strategy.
           </p>
         </header>
@@ -77,10 +77,12 @@ export default function BlogListPage() {
         <div className="space-y-8">
           {posts.length > 0 ? posts.map((post) => (
             <Link href={`/blog/${post.slug}`} key={post.id} className="block group">
-              <Card className="rounded-2xl hover:shadow-xl transition-shadow">
+              <Card className="rounded-2xl hover:shadow-xl transition-shadow bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                 <CardHeader>
-                  <CardTitle className="group-hover:text-blue-600 transition-colors">{post.title}</CardTitle>
-                  <p className="text-sm text-slate-500 pt-1">
+                  <CardTitle className="group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-slate-900 dark:text-slate-100">
+                    {post.title}
+                  </CardTitle>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 pt-1">
                     {new Date(post.date).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -89,10 +91,16 @@ export default function BlogListPage() {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-slate-700 mb-4">{post.excerpt}</p>
+                  <p className="text-slate-700 dark:text-slate-300 mb-4">{post.excerpt}</p>
                   <div className="flex flex-wrap gap-2">
                     {(post.tags || []).map((tag) => (
-                      <Badge key={tag} variant="secondary">{tag}</Badge>
+                      <Badge 
+                        key={tag} 
+                        variant="secondary" 
+                        className="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-600"
+                      >
+                        {tag}
+                      </Badge>
                     ))}
                   </div>
                 </CardContent>
@@ -100,8 +108,8 @@ export default function BlogListPage() {
             </Link>
           )) : (
             <div className="text-center py-12">
-              <p className="text-slate-500">No blog posts have been published yet.</p>
-              <p className="text-sm text-slate-400 mt-2">Go to the admin panel to create your first post.</p>
+              <p className="text-slate-500 dark:text-slate-400">No blog posts have been published yet.</p>
+              <p className="text-sm text-slate-400 dark:text-slate-500 mt-2">Go to the admin panel to create your first post.</p>
             </div>
           )}
         </div>
