@@ -4,9 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -15,33 +18,87 @@ export default function Navbar() {
     { href: '/blog', label: 'Blog' },
   ];
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          Sam Mehrany
-        </Link>
-        <div className="hidden md:flex items-center gap-6 text-sm">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "text-muted-foreground transition-colors hover:text-foreground",
-                // This logic correctly highlights the active page, including sub-pages like a single project.
-                (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))) && "text-foreground font-semibold"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-        <div className="hidden md:flex">
-            {/* This link now correctly points to the project request form on the homepage */}
+      <nav className="max-w-6xl mx-auto px-6 py-3">
+        {/* Desktop and Mobile Header */}
+        <div className="flex justify-between items-center">
+          <Link href="/" className="text-xl font-bold tracking-tight" onClick={closeMobileMenu}>
+            Sam Mehrany
+          </Link>
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-6 text-sm">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "text-muted-foreground transition-colors hover:text-foreground",
+                  (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))) && "text-foreground font-semibold"
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          
+          {/* Desktop CTA Button */}
+          <div className="hidden md:flex">
             <Link href="/#project-request">
-                <Button>Request a Project</Button>
+              <Button>Request a Project</Button>
             </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </button>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t">
+            <div className="flex flex-col gap-4 pt-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "text-muted-foreground transition-colors hover:text-foreground py-2 px-2 rounded-lg",
+                    (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))) && "text-foreground font-semibold bg-gray-50"
+                  )}
+                  onClick={closeMobileMenu}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              
+              {/* Mobile CTA Button */}
+              <div className="pt-2">
+                <Link href="/#project-request" onClick={closeMobileMenu}>
+                  <Button className="w-full">Request a Project</Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );
