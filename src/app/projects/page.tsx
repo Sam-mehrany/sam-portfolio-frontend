@@ -1,8 +1,9 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-// Remove Next.js Image import - we'll use regular img tags
-// import Image from "next/image";
+import { useState, useEffect } from "react";
 
 // Backend URL for direct image access
 const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sam-portfolio-backend.liara.run';
@@ -21,8 +22,7 @@ interface Project {
 // --- DATA FETCHING ---
 async function getProjects(): Promise<Project[]> {
   try {
-    // Use the rewrite rule from next.config.ts
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/projects`, {
+    const response = await fetch('/api/projects', {
       cache: 'no-store'
     });
     
@@ -37,8 +37,37 @@ async function getProjects(): Promise<Project[]> {
   }
 }
 
-export default async function AllProjectsPage() {
-  const projects = await getProjects();
+export default function AllProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const data = await getProjects();
+      setProjects(data);
+      setLoading(false);
+    };
+    fetchProjects();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+        <div className="max-w-6xl mx-auto px-6 py-16">
+          <header className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">All Projects</h1>
+            <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+              A complete collection of my work, from web design to AI-driven campaigns.
+            </p>
+          </header>
+          <div className="text-center">
+            <p className="text-slate-500">Loading projects...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (projects.length === 0) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
@@ -92,9 +121,6 @@ export default async function AllProjectsPage() {
                           if (fallback) {
                             fallback.classList.remove('hidden');
                           }
-                        }}
-                        onLoad={() => {
-                          console.log('Image loaded successfully:', thumbnailUrl);
                         }}
                       />
                     ) : null}
