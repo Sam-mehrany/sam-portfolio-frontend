@@ -17,9 +17,11 @@ interface Project {
 // --- DATA FETCHING ---
 async function getProjects(): Promise<Project[]> {
   try {
-    const response = await fetch('http://localhost:8000/api/projects', {
+    // Use the rewrite rule from next.config.ts
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/projects`, {
       cache: 'no-store'
     });
+    
     if (!response.ok) {
       console.error("Failed to fetch projects, server responded with:", response.status);
       return [];
@@ -33,6 +35,24 @@ async function getProjects(): Promise<Project[]> {
 
 export default async function AllProjectsPage() {
   const projects = await getProjects();
+
+  if (projects.length === 0) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+        <div className="max-w-6xl mx-auto px-6 py-16">
+          <header className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">All Projects</h1>
+            <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+              A complete collection of my work, from web design to AI-driven campaigns.
+            </p>
+          </header>
+          <div className="text-center">
+            <p className="text-slate-500">No projects found. Create some projects in the admin panel!</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
