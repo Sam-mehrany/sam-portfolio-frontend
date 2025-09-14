@@ -125,22 +125,22 @@ export default function Portfolio() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-100">
       {/* Hero */}
       <header className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid md:grid-cols-3 gap-8 items-center">
           <div className="md:col-span-2">
-            <div className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-1 text-sm mb-4">
+            <div className="inline-flex items-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-700 px-3 py-1 text-sm mb-4">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              {content?.hero?.availability || 'Loading...'}
+              <span className="text-slate-800 dark:text-slate-200">{content?.hero?.availability || 'Loading...'}</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Sam Mehrany</h1>
-            <p className="mt-4 text-lg md:text-xl text-slate-600 max-w-2xl">
+            <p className="mt-4 text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl">
               {content?.hero?.headline || 'Loading...'}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               {skills.map((s) => (
-                <Badge key={s} variant="secondary" className="rounded-full text-slate-700">{s}</Badge>
+                <Badge key={s} variant="secondary" className="rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200">{s}</Badge>
               ))}
             </div>
             <div className="mt-8">
@@ -148,15 +148,15 @@ export default function Portfolio() {
             </div>
           </div>
           <div className="md:justify-self-end w-full">
-            <Card className="rounded-xl shadow-lg">
-              <CardHeader><CardTitle>Snapshot</CardTitle></CardHeader>
-              <CardContent className="space-y-2 text-sm text-slate-600">
+            <Card className="rounded-xl shadow-lg bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+              <CardHeader><CardTitle className="text-slate-900 dark:text-slate-100">Snapshot</CardTitle></CardHeader>
+              <CardContent className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                 <div className="flex justify-between"><span>Role</span><span className="font-medium ml-2">{content?.snapshot?.role}</span></div>
                 <div className="flex justify-between"><span>Location</span><span className="font-medium ml-2">{content?.snapshot?.location}</span></div>
                 <div className="flex justify-between"><span>Focus</span><span className="font-medium ml-2">{content?.snapshot?.focus}</span></div>
-                <div className="flex items-center justify-start gap-4 pt-4 mt-4 border-t">
+                <div className="flex items-center justify-start gap-4 pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
                   {socials.map((s) => (
-                    <a key={s.label} href={s.href} className="text-slate-600 hover:text-slate-900" target="_blank" rel="noopener noreferrer">
+                    <a key={s.label} href={s.href} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" target="_blank" rel="noopener noreferrer">
                       {s.icon}<span className="sr-only">{s.label}</span>
                     </a>
                   ))}
@@ -170,7 +170,7 @@ export default function Portfolio() {
       {/* Projects */}
       <section id="projects" className="max-w-6xl mx-auto px-6 py-12">
         <h2 className="text-2xl md:text-3xl font-semibold">{content?.work?.title || 'Selected Work'}</h2>
-        <p className="text-slate-600 mt-2">{content?.work?.subtitle}</p>
+        <p className="text-slate-600 dark:text-slate-400 mt-2">{content?.work?.subtitle}</p>
 
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           {featuredProjects.length > 0 ? featuredProjects.map((p) => {
@@ -183,8 +183,8 @@ export default function Portfolio() {
             
             return (
               <Link href={`/projects/${p.slug}`} key={p.slug} className="group">
-                <Card className="p-0 rounded-lg hover:shadow-xl transition-shadow h-full flex flex-col overflow-hidden">
-                  <div className="relative aspect-[16/9] bg-slate-100 overflow-hidden">
+                <Card className="p-0 rounded-lg hover:shadow-xl transition-shadow h-full flex flex-col overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                  <div className="relative aspect-[16/9] bg-slate-100 dark:bg-slate-700 overflow-hidden">
                     {thumbnailUrl ? (
                       <img
                         src={thumbnailUrl}
@@ -200,22 +200,22 @@ export default function Portfolio() {
                         }}
                       />
                     ) : null}
-                    <div className={`w-full h-full flex items-center justify-center text-xs text-slate-500 ${thumbnailUrl ? 'hidden' : ''}`}>
+                    <div className={`w-full h-full flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 ${thumbnailUrl ? 'hidden' : ''}`}>
                       No Image Available
                     </div>
                   </div>
                   <div className="flex flex-col flex-grow p-4">
                     <CardHeader className="p-0">
-                      <CardTitle className="flex items-center justify-between group-hover:text-blue-600 transition-colors">
-                        <span>{p.title}</span>
-                        <span className="text-sm font-normal text-slate-500">{p.year}</span>
+                      <CardTitle className="flex items-center justify-between group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <span className="text-slate-900 dark:text-slate-100">{p.title}</span>
+                        <span className="text-sm font-normal text-slate-500 dark:text-slate-400">{p.year}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0 pt-4 flex-grow">
-                      <p className="text-slate-700">{p.blurb}</p>
+                      <p className="text-slate-700 dark:text-slate-300">{p.blurb}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {(p.tags || []).map((t) => (
-                          <Badge key={t} variant="secondary" className="rounded-full">{t}</Badge>
+                          <Badge key={t} variant="secondary" className="rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200">{t}</Badge>
                         ))}
                       </div>
                     </CardContent>
@@ -223,7 +223,7 @@ export default function Portfolio() {
                 </Card>
               </Link>
             );
-          }) : <p className="text-slate-500 md:col-span-2">No featured projects have been selected yet.</p>}
+          }) : <p className="text-slate-500 dark:text-slate-400 md:col-span-2">No featured projects have been selected yet.</p>}
         </div>
         <div className="mt-8">
           <Link href="/projects"><Button>View All Projects</Button></Link>
@@ -231,14 +231,15 @@ export default function Portfolio() {
 
         {/* Project Request Form */}
         <div id="contact" className="mt-12">
-          <Card className="p-6 rounded-xl">
-            <h3 className="text-lg font-semibold mb-2">Have a project in mind?</h3>
+          <Card className="p-6 rounded-xl bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-slate-100">Have a project in mind?</h3>
             <form onSubmit={handleInitialSubmit} className="flex flex-col sm:flex-row gap-3">
               <Input
                 placeholder="Describe your project idea in a few words…"
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
                 required
+                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
               />
               <Button type="submit">Continue</Button>
             </form>
@@ -248,28 +249,29 @@ export default function Portfolio() {
 
       {/* Confirmation Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className={`sm:max-w-[425px] transition-colors duration-300 ${isSubmitted ? 'bg-emerald-50' : ''}`}>
+        <DialogContent className={`sm:max-w-[425px] transition-colors duration-300 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 ${isSubmitted ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}`}>
           {!isSubmitted ? (
             <>
               <DialogHeader>
-                <DialogTitle>Complete Your Request</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-slate-900 dark:text-slate-100">Complete Your Request</DialogTitle>
+                <DialogDescription className="text-slate-600 dark:text-slate-400">
                   Just one last step. Please provide your contact info so I can get back to you.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>
-                  <h4 className="font-semibold text-sm text-slate-500">Your Project Idea:</h4>
-                  <p className="text-sm p-3 bg-slate-100 rounded-md mt-1">{projectDescription}</p>
+                  <h4 className="font-semibold text-sm text-slate-500 dark:text-slate-400">Your Project Idea:</h4>
+                  <p className="text-sm p-3 bg-slate-100 dark:bg-slate-700 rounded-md mt-1 text-slate-800 dark:text-slate-200">{projectDescription}</p>
                 </div>
                 <div className="grid gap-2">
-                  <label htmlFor="contact-info" className="font-semibold text-sm">Your WhatsApp or Email</label>
+                  <label htmlFor="contact-info" className="font-semibold text-sm text-slate-900 dark:text-slate-100">Your WhatsApp or Email</label>
                   <Input
                     id="contact-info"
                     placeholder="Enter contact info..."
                     value={contactInfo}
                     onChange={(e) => setContactInfo(e.target.value)}
                     required
+                    className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -281,8 +283,8 @@ export default function Portfolio() {
           ) : (
             <>
               <DialogHeader className="text-center py-8">
-                <DialogTitle className="text-2xl">Thank You!</DialogTitle>
-                <DialogDescription className="text-emerald-900 pt-2">
+                <DialogTitle className="text-2xl text-slate-900 dark:text-slate-100">Thank You!</DialogTitle>
+                <DialogDescription className="text-emerald-900 dark:text-emerald-100 pt-2">
                   Your project request has been submitted. I will get back to you shortly.
                 </DialogDescription>
               </DialogHeader>
@@ -291,7 +293,7 @@ export default function Portfolio() {
         </DialogContent>
       </Dialog>
 
-      <footer className="py-10 text-center text-sm text-slate-500">
+      <footer className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">
         © {new Date().getFullYear()} Sam Mehrany — Built with ❤️ + Tailwind
       </footer>
     </div>
