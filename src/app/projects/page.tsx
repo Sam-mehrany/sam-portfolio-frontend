@@ -65,45 +65,58 @@ export default async function AllProjectsPage() {
         </header>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((p) => (
-            <Link href={`/projects/${p.slug}`} key={p.id} className="group">
-              <Card className="p-0 rounded-lg hover:shadow-xl transition-shadow h-full flex flex-col overflow-hidden">
-                <div className="relative aspect-[16/9] bg-slate-100">
-                  {p.thumbnail ? (
-                    <Image
-                      src={p.thumbnail}
-                      alt={`${p.title} thumbnail`}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
-                      No Image
+          {projects.map((p) => {
+            // Construct direct image URL to backend
+            const thumbnailUrl = p.thumbnail 
+              ? (p.thumbnail.startsWith('http') 
+                  ? p.thumbnail 
+                  : `${backendUrl}${p.thumbnail}`)
+              : null;
+            
+            return (
+              <Link href={`/projects/${p.slug}`} key={p.id} className="group">
+                <Card className="p-0 rounded-lg hover:shadow-xl transition-shadow h-full flex flex-col overflow-hidden">
+                  <div className="relative aspect-[16/9] bg-slate-100 overflow-hidden">
+                    {thumbnailUrl ? (
+                      <img
+                        src={thumbnailUrl}
+                        alt={`${p.title} thumbnail`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          console.error('Image failed to load:', thumbnailUrl);
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
+                        onLoad={() => {
+                          console.log('Image loaded successfully:', thumbnailUrl);
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-full h-full flex items-center justify-center text-xs text-slate-500 ${thumbnailUrl ? 'hidden' : ''}`}>
+                      No Image Available
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                <div className="flex flex-col flex-grow p-4">
-                  <CardHeader className="p-0">
-                    <CardTitle className="flex items-center justify-between group-hover:text-blue-600 transition-colors">
-                      <span>{p.title}</span>
-                      <span className="text-sm font-normal text-slate-500">{p.year}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0 pt-4 flex-grow">
-                    <p className="text-slate-700">{p.blurb}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {(p.tags || []).map((t) => (
-                        <Badge key={t} variant="secondary" className="rounded-full">{t}</Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </div>
-              </Card>
-            </Link>
-          ))}
+                  <div className="flex flex-col flex-grow p-4">
+                    <CardHeader className="p-0">
+                      <CardTitle className="flex items-center justify-between group-hover:text-blue-600 transition-colors">
+                        <span>{p.title}</span>
+                        <span className="text-sm font-normal text-slate-500">{p.year}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0 pt-4 flex-grow">
+                      <p className="text-slate-700">{p.blurb}</p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {(p.tags || []).map((t) => (
+                          <Badge key={t} variant="secondary" className="rounded-full">{t}</Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </div>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </main>
