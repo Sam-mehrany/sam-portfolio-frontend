@@ -1,14 +1,23 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-import Navbar from "@/components/Navbar"; // <-- Import the new Navbar
+import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "@/components/Navbar";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff2",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+});
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff2",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+});
 
 export const metadata: Metadata = {
-  title: "Sam Mehrany | Product Designer",
-  description: "Portfolio of Sam Mehrany, a product designer specializing in UI/UX and generative AI campaigns.",
+  title: "Sam Mehrany - Portfolio",
+  description: "UI/UX Designer and Creative Technologist",
 };
 
 export default function RootLayout({
@@ -19,13 +28,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          inter.variable
-        )}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar /> {/* <-- Add the Navbar component here */}
-        <main>{children}</main> {/* This is where your page content will go */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={true}
+          disableTransitionOnChange={false}
+        >
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
