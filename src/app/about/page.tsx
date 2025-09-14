@@ -1,6 +1,9 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, GraduationCap, Wrench } from "lucide-react";
+import { useState, useEffect } from "react";
 
 // --- TYPE DEFINITIONS ---
 interface Experience {
@@ -29,7 +32,7 @@ interface AboutPageContent {
 // --- DATA FETCHING ---
 async function getPageContent(): Promise<AboutPageContent | null> {
   try {
-    const res = await fetch('http://localhost:8000/api/pages/about', { cache: 'no-store' });
+    const res = await fetch('/api/pages/about', { cache: 'no-store' });
     if (!res.ok) return null;
     const page = await res.json();
     return page.content;
@@ -40,26 +43,51 @@ async function getPageContent(): Promise<AboutPageContent | null> {
 }
 
 // --- COMPONENT ---
-export default async function AboutPage() {
-  const content = await getPageContent();
+export default function AboutPage() {
+  const [content, setContent] = useState<AboutPageContent | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      const data = await getPageContent();
+      setContent(data);
+      setLoading(false);
+    };
+    fetchContent();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-100">
+        <div className="max-w-6xl mx-auto px-6 py-16">
+          <header className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">About Me</h1>
+            <div className="mt-4">
+              <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+            </div>
+          </header>
+        </div>
+      </main>
+    );
+  }
 
   // Provide default data if content fails to load
   const summary = content?.summary || "Content is loading...";
   const experiences = content?.experiences || [];
   const educations = content?.educations || [];
   
-  // FIX: Directly use the arrays from the content object. No .split() needed.
+  // Directly use the arrays from the content object. No .split() needed.
   const technicalSkills = content?.skills?.technical || [];
   const softSkills = content?.skills?.soft || [];
   const tools = content?.skills?.tools || [];
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+    <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-100">
       <div className="max-w-6xl mx-auto px-6 py-16">
         {/* Header Section */}
         <header className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight">About Me</h1>
-          <p className="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
             {summary}
           </p>
         </header>
@@ -68,7 +96,7 @@ export default async function AboutPage() {
           {/* Section Titles Grid */}
           <div className="grid md:grid-cols-3 gap-8">
             <h2 className="md:col-span-2 text-3xl font-semibold flex items-center gap-3">
-              <Briefcase className="h-8 w-8 text-slate-500" />
+              <Briefcase className="h-8 w-8 text-slate-500 dark:text-slate-400" />
               Work Experience
             </h2>
             <h2 className="md:col-span-1 text-3xl font-semibold">
@@ -81,16 +109,16 @@ export default async function AboutPage() {
             {/* Main Column: Work Experience Cards */}
             <div className="md:col-span-2 space-y-8">
               {experiences.map((exp) => (
-                <Card key={exp.id} className="rounded-2xl">
+                <Card key={exp.id} className="rounded-2xl bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                   <CardHeader>
-                    <CardTitle className="flex justify-between items-baseline">
+                    <CardTitle className="flex justify-between items-baseline text-slate-900 dark:text-slate-100">
                       <span className="text-xl">{exp.role}</span>
-                      <span className="text-sm font-normal text-slate-500">{exp.period}</span>
+                      <span className="text-sm font-normal text-slate-500 dark:text-slate-400">{exp.period}</span>
                     </CardTitle>
-                    <p className="text-md text-slate-600 font-medium">{exp.company}</p>
+                    <p className="text-md text-slate-600 dark:text-slate-400 font-medium">{exp.company}</p>
                   </CardHeader>
                   <CardContent>
-                    <ul className="list-disc list-inside space-y-2 text-slate-700">
+                    <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
                       {exp.points.split('\n').map((point, index) => (
                         point && <li key={index}>{point}</li>
                       ))}
@@ -102,37 +130,41 @@ export default async function AboutPage() {
 
             {/* Sidebar Column: Skills, Tools, Education Cards */}
             <div className="md:col-span-1 space-y-8">
-              <Card className="rounded-2xl">
-                <CardHeader><CardTitle className="text-xl">Technical Skills</CardTitle></CardHeader>
+              <Card className="rounded-2xl bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                <CardHeader><CardTitle className="text-xl text-slate-900 dark:text-slate-100">Technical Skills</CardTitle></CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
-                  {technicalSkills.map(skill => <Badge key={skill}>{skill}</Badge>)}
+                  {technicalSkills.map(skill => <Badge key={skill} className="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200">{skill}</Badge>)}
                 </CardContent>
               </Card>
               
-              <Card className="rounded-2xl">
-                <CardHeader><CardTitle className="text-xl">Soft Skills</CardTitle></CardHeader>
+              <Card className="rounded-2xl bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                <CardHeader><CardTitle className="text-xl text-slate-900 dark:text-slate-100">Soft Skills</CardTitle></CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
-                  {softSkills.map(skill => <Badge variant="secondary" key={skill}>{skill}</Badge>)}
+                  {softSkills.map(skill => <Badge variant="secondary" key={skill} className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-300">{skill}</Badge>)}
                 </CardContent>
               </Card>
 
-              <Card className="rounded-2xl">
+              <Card className="rounded-2xl bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2"><Wrench className="h-5 w-5" /> Tools & Software</CardTitle>
+                  <CardTitle className="text-xl flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                    <Wrench className="h-5 w-5" /> Tools & Software
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
-                  {tools.map(tool => <Badge variant="outline" key={tool}>{tool}</Badge>)}
+                  {tools.map(tool => <Badge variant="outline" key={tool} className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300">{tool}</Badge>)}
                 </CardContent>
               </Card>
 
               {educations.map((edu) => (
-                <Card key={edu.id} className="rounded-2xl">
+                <Card key={edu.id} className="rounded-2xl bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                   <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2"><GraduationCap className="h-5 w-5" /> Education</CardTitle>
+                    <CardTitle className="text-xl flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                      <GraduationCap className="h-5 w-5" /> Education
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    <p className="font-semibold">{edu.degree}</p>
-                    <p className="text-sm text-slate-600">{edu.university}</p>
+                    <p className="font-semibold text-slate-900 dark:text-slate-100">{edu.degree}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{edu.university}</p>
                   </CardContent>
                 </Card>
               ))}
