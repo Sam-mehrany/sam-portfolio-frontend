@@ -1,8 +1,14 @@
+"use client";
+
 import Link from 'next/link';
-import Image from 'next/image';
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
+// Backend URL for direct image access
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sam-portfolio-backend.liara.run';
 
 // --- TYPE DEFINITIONS ---
 interface ContentSection {
@@ -22,21 +28,12 @@ interface Post {
   content: ContentSection[];
 }
 
-// ✅ ADD THIS TYPE DEFINITION for the page's props
-type PageProps = {
-  params: {
-    slug: string;
-  };
-};
-
 // --- DATA FETCHING ---
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    // Note: This URL will need to be updated to a production URL for deployment
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const res = await fetch(`${apiUrl}/api/posts/slug/${slug}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    return res.json();
+    const response = await fetch(`/api/posts/slug/${slug}`, { cache: 'no-store' });
+    if (!response.ok) return null;
+    return response.json();
   } catch (error) {
     console.error("Failed to fetch post:", error);
     return null;
@@ -44,18 +41,59 @@ async function getPost(slug: string): Promise<Post | null> {
 }
 
 // --- COMPONENT ---
-// ✅ UPDATE THE COMPONENT SIGNATURE to use the new type
-export default async function SinglePostPage({ params }: any) {
-  const post = await getPost(params.slug);
+export default function SinglePostPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!post) {
+  useEffect(() => {
+    if (slug) {
+      const fetchPost = async () => {
+        try {
+          const data = await getPost(slug);
+          if (data) {
+            setPost(data);
+          } else {
+            setError('Post not found');
+          }
+        } catch (err) {
+          setError('Failed to load post');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchPost();
+    }
+  }, [slug]);
+
+  if (loading) {
     return (
-      <div className="text-center py-24">
-        <h1 className="text-4xl font-bold">Post Not Found</h1>
-        <Link href="/blog" className="mt-4 text-blue-500 hover:underline">
-          Return to Blog
-        </Link>
-      </div>
+      <main className="min-h-screen bg-white">
+        <div className="max-w-3xl mx-auto px-6 py-16 lg:py-24">
+          <div className="text-center">
+            <p className="text-slate-500">Loading post...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <main className="min-h-screen bg-white">
+        <div className="max-w-3xl mx-auto px-6 py-16 lg:py-24">
+          <div className="text-center py-24">
+            <h1 className="text-4xl font-bold">Post Not Found</h1>
+            <p className="mt-2 text-slate-600">{error}</p>
+            <Link href="/blog" className="mt-4 inline-block text-blue-500 hover:underline">
+              Return to Blog
+            </Link>
+          </div>
+        </div>
+      </main>
     );
   }
 
@@ -79,24 +117,34 @@ export default async function SinglePostPage({ params }: any) {
         </header>
 
         <article className="prose lg:prose-xl">
-          {(post.content || []).map((section, index) => (
-            <section key={index} className="mb-8">
-              {section.title && <h2>{section.title}</h2>}
-              {section.subtitle && <h3 className="text-slate-600">{section.subtitle}</h3>}
-              {section.imageUrl && (
-                <div className="relative w-full h-80 rounded-lg my-4 overflow-hidden">
-                  <Image
-                    src={section.imageUrl}
-                    alt={section.title || 'Blog post image'}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-              )}
-              <ReactMarkdown>{section.body}</ReactMarkdown>
-            </section>
-          ))}
+          {(post.content || []).map((section, index) => {
+            const sectionImageUrl = section.imageUrl 
+              ? (section.imageUrl.startsWith('http') 
+                  ? section.imageUrl 
+                  : `${backendUrl}${section.imageUrl}`)
+              : null;
+
+            return (
+              <section key={index} className="mb-8">
+                {section.title && <h2>{section.title}</h2>}
+                {section.subtitle && <h3 className="text-slate-600">{section.subtitle}</h3>}
+                {sectionImageUrl && (
+                  <div className="relative w-full h-80 rounded-lg my-4 overflow-hidden">
+                    <img
+                      src={sectionImageUrl}
+                      alt={section.title || 'Blog post image'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+                <ReactMarkdown>{section.body}</ReactMarkdown>
+              </section>
+            );
+          })}
         </article>
       </div>
     </main>
