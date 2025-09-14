@@ -1,6 +1,9 @@
+"use client";
+
 import Link from 'next/link';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 
 // --- TYPE DEFINITION ---
 interface Post {
@@ -15,15 +18,14 @@ interface Post {
 // --- DATA FETCHING ---
 async function getPosts(): Promise<Post[]> {
   try {
-    // On the server, we use the full URL to the backend
-    const res = await fetch('http://localhost:8000/api/posts', { 
-      cache: 'no-store' // This ensures the list is always fresh
+    const response = await fetch('/api/posts', { 
+      cache: 'no-store'
     });
-    if (!res.ok) {
-      console.error("Failed to fetch posts, server responded with:", res.status);
+    if (!response.ok) {
+      console.error("Failed to fetch posts, server responded with:", response.status);
       return [];
     }
-    return res.json();
+    return response.json();
   } catch (error) {
     console.error("Failed to fetch posts:", error);
     return [];
@@ -31,8 +33,36 @@ async function getPosts(): Promise<Post[]> {
 }
 
 // --- COMPONENT ---
-export default async function BlogListPage() {
-  const posts = await getPosts();
+export default function BlogListPage() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const data = await getPosts();
+      setPosts(data);
+      setLoading(false);
+    };
+    fetchPosts();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+        <div className="max-w-4xl mx-auto px-6 py-16">
+          <header className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">Blog & Articles</h1>
+            <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+              Thoughts on design, technology, and creative strategy.
+            </p>
+          </header>
+          <div className="text-center">
+            <p className="text-slate-500">Loading blog posts...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
@@ -51,7 +81,6 @@ export default async function BlogListPage() {
                 <CardHeader>
                   <CardTitle className="group-hover:text-blue-600 transition-colors">{post.title}</CardTitle>
                   <p className="text-sm text-slate-500 pt-1">
-                    {/* Format the date for better readability */}
                     {new Date(post.date).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
