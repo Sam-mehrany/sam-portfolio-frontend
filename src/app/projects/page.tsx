@@ -86,9 +86,12 @@ export default async function AllProjectsPage() {
                         alt={`${p.title} thumbnail`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
-                          console.error('Image failed to load:', thumbnailUrl);
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) {
+                            fallback.classList.remove('hidden');
+                          }
                         }}
                         onLoad={() => {
                           console.log('Image loaded successfully:', thumbnailUrl);
