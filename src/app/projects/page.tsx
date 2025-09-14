@@ -39,7 +39,6 @@ async function getProjects(): Promise<Project[]> {
 
 export default async function AllProjectsPage() {
   const projects = await getProjects();
-
   if (projects.length === 0) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
