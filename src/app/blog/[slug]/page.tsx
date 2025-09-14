@@ -118,11 +118,17 @@ export default function SinglePostPage() {
 
         <article className="prose lg:prose-xl">
           {(post.content || []).map((section, index) => {
+            // Debug the section imageUrl
+            console.log('Section imageUrl:', section.imageUrl);
+            
             const sectionImageUrl = section.imageUrl 
               ? (section.imageUrl.startsWith('http') 
                   ? section.imageUrl 
                   : `${backendUrl}${section.imageUrl}`)
               : null;
+            
+            // Debug the final constructed URL
+            console.log('Final image URL:', sectionImageUrl);
 
             return (
               <section key={index} className="mb-8">
@@ -136,7 +142,17 @@ export default function SinglePostPage() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
+                        console.error('Image failed to load:', sectionImageUrl);
+                        console.error('Error event:', e);
                         target.style.display = 'none';
+                        // Show fallback text
+                        const fallback = document.createElement('div');
+                        fallback.className = 'flex items-center justify-center h-80 bg-gray-100 text-gray-500';
+                        fallback.textContent = 'Image failed to load';
+                        target.parentNode?.appendChild(fallback);
+                      }}
+                      onLoad={() => {
+                        console.log('Image loaded successfully:', sectionImageUrl);
                       }}
                     />
                   </div>
