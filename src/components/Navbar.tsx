@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { ThemeToggle } from './theme-toggle';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -51,8 +52,9 @@ export default function Navbar() {
             ))}
           </div>
           
-          {/* Desktop CTA Button */}
-          <div className="hidden md:flex">
+          {/* Desktop CTA Button and Theme Toggle */}
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <Link href="/#project-request">
               <Button>Request a Project</Button>
             </Link>
@@ -85,7 +87,7 @@ export default function Navbar() {
                   href={link.href}
                   className={cn(
                     "text-muted-foreground transition-colors hover:text-foreground py-2 px-2 rounded-lg",
-                    (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))) && "text-foreground font-semibold bg-gray-50"
+                    (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))) && "text-foreground font-semibold bg-gray-50 dark:bg-gray-800"
                   )}
                   onClick={closeMobileMenu}
                 >
