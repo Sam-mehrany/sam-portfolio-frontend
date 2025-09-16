@@ -136,61 +136,105 @@ export default function NewBlogPage() {
 
   return (
     <AuthGuard>
-      <main className="min-h-screen bg-slate-100">
+      <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-3xl mx-auto px-6 py-16">
           <header className="mb-8">
             <div className="flex items-center justify-between">
-              <h1 className="text-4xl font-bold">New Post</h1>
+              <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">New Post</h1>
               <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
-            <Link href="/admin/blog" className="text-sm text-blue-500 hover:underline">
+            <Link href="/admin/blog" className="text-sm text-blue-500 dark:text-blue-400 hover:underline">
               ← Back to All Posts
             </Link>
           </header>
-          <Card>
+          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 
-                <div className="space-y-4 p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Post Details</h3>
+                <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Post Details</h3>
                   <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700">Post Title</label>
-                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                    <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Post Title</label>
+                    <Input 
+                      id="title" 
+                      value={title} 
+                      onChange={(e) => setTitle(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      required 
+                    />
                   </div>
                   <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700">URL Slug</label>
-                    <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
+                    <label htmlFor="slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300">URL Slug</label>
+                    <Input 
+                      id="slug" 
+                      value={slug} 
+                      onChange={(e) => setSlug(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      required 
+                    />
                   </div>
                   <div>
-                    <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700">Excerpt</label>
-                    <Textarea id="excerpt" value={excerpt} onChange={(e) => setExcerpt(e.target.value)} />
+                    <label htmlFor="excerpt" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Excerpt</label>
+                    <Textarea 
+                      id="excerpt" 
+                      value={excerpt} 
+                      onChange={(e) => setExcerpt(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                    />
                   </div>
                   <div>
-                    <label htmlFor="tags" className="block text-sm font-medium text-gray-700">Tags</label>
-                    <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} />
+                    <label htmlFor="tags" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Tags</label>
+                    <Input 
+                      id="tags" 
+                      value={tags} 
+                      onChange={(e) => setTags(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                    />
                   </div>
                   <div>
-                    <label htmlFor="date" className="block text-sm font-medium text-gray-700">Date</label>
-                    <Input id="date" type="text" value={date} onChange={(e) => setDate(e.target.value)} required />
+                    <label htmlFor="date" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Date</label>
+                    <Input 
+                      id="date" 
+                      type="text" 
+                      value={date} 
+                      onChange={(e) => setDate(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      required 
+                    />
                   </div>
                 </div>
 
-                <div className="p-4 border rounded-lg space-y-4">
-                  <h3 className="font-semibold text-lg">Post Content</h3>
+                <div className="p-4 border border-slate-200 dark:border-slate-600 rounded-lg space-y-4 bg-slate-50 dark:bg-slate-700/50">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Post Content</h3>
                   {sections.map((section, index) => (
-                    <div key={section.id} className="p-4 border rounded-md relative space-y-3">
+                    <div key={section.id} className="p-4 border border-slate-200 dark:border-slate-600 rounded-md relative space-y-3 bg-white dark:bg-slate-700">
                       <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-7 w-7" onClick={() => removeSection(section.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
-                      <h4 className="font-medium">Section {index + 1}</h4>
-                      <Input value={section.title} onChange={(e) => handleSectionChange(section.id, 'title', e.target.value)} placeholder="Section Title (optional)" />
-                      <Input value={section.subtitle} onChange={(e) => handleSectionChange(section.id, 'subtitle', e.target.value)} placeholder="Section Subtitle (optional)" />
-                      <Textarea value={section.body} onChange={(e) => handleSectionChange(section.id, 'body', e.target.value)} placeholder="Section body text..." className="min-h-[120px]" />
+                      <h4 className="font-medium text-slate-900 dark:text-slate-100">Section {index + 1}</h4>
+                      <Input 
+                        value={section.title} 
+                        onChange={(e) => handleSectionChange(section.id, 'title', e.target.value)} 
+                        placeholder="Section Title (optional)" 
+                        className="bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                      />
+                      <Input 
+                        value={section.subtitle} 
+                        onChange={(e) => handleSectionChange(section.id, 'subtitle', e.target.value)} 
+                        placeholder="Section Subtitle (optional)" 
+                        className="bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                      />
+                      <Textarea 
+                        value={section.body} 
+                        onChange={(e) => handleSectionChange(section.id, 'body', e.target.value)} 
+                        placeholder="Section body text..." 
+                        className="min-h-[120px] bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100" 
+                      />
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Image</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Image</label>
                         <div className="relative w-full max-w-xs">
                           {section.image && (
                             <img src={URL.createObjectURL(section.image)} alt="New preview" className="rounded-md w-full h-auto" />
@@ -208,7 +252,11 @@ export default function NewBlogPage() {
                             </Button>
                           )}
                         </div>
-                        <Input type="file" onChange={(e) => handleSectionChange(section.id, 'image', e.target.files ? e.target.files[0] : null)} />
+                        <Input 
+                          type="file" 
+                          onChange={(e) => handleSectionChange(section.id, 'image', e.target.files ? e.target.files[0] : null)} 
+                          className="bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                        />
                       </div>
                     </div>
                   ))}
@@ -222,7 +270,7 @@ export default function NewBlogPage() {
                   {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
                 </Button>
               </form>
-              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>{message}</p>}
+              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-500 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>{message}</p>}
             </CardContent>
           </Card>
         </div>
