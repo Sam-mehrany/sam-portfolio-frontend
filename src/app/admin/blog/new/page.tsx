@@ -156,7 +156,7 @@ export default function NewBlogPage() {
                 <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
                   <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Post Details</h3>
                   <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Post Title</label>
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Post Title</label>
                     <Input 
                       id="title" 
                       value={title} 
@@ -166,7 +166,7 @@ export default function NewBlogPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300">URL Slug</label>
+                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300">URL Slug</label>
                     <Input 
                       id="slug" 
                       value={slug} 
@@ -176,7 +176,7 @@ export default function NewBlogPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="excerpt" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Excerpt</label>
+                    <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Excerpt</label>
                     <Textarea 
                       id="excerpt" 
                       value={excerpt} 
@@ -185,7 +185,7 @@ export default function NewBlogPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="tags" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Tags</label>
+                    <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags</label>
                     <Input 
                       id="tags" 
                       value={tags} 
@@ -194,7 +194,7 @@ export default function NewBlogPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="date" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Date</label>
+                    <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
                     <Input 
                       id="date" 
                       type="text" 
@@ -234,7 +234,7 @@ export default function NewBlogPage() {
                       />
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Image</label>
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Image</label>
                         <div className="relative w-full max-w-xs">
                           {section.image && (
                             <img src={URL.createObjectURL(section.image)} alt="New preview" className="rounded-md w-full h-auto" />
@@ -267,10 +267,10 @@ export default function NewBlogPage() {
                 </div>
 
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+                  {isSubmitting ? 'Creating Post...' : 'Create Post'}
                 </Button>
               </form>
-              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-500 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>{message}</p>}
+              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`}>{message}</p>}
             </CardContent>
           </Card>
         </div>
