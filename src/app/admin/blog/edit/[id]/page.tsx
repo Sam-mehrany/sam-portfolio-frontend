@@ -194,7 +194,7 @@ export default function EditBlogPage() {
                       id="title" 
                       value={title} 
                       onChange={(e) => setTitle(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
                       required 
                     />
                   </div>
@@ -204,7 +204,7 @@ export default function EditBlogPage() {
                       id="slug" 
                       value={slug} 
                       onChange={(e) => setSlug(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
                       required 
                     />
                   </div>
@@ -214,7 +214,7 @@ export default function EditBlogPage() {
                       id="excerpt" 
                       value={excerpt} 
                       onChange={(e) => setExcerpt(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
                     />
                   </div>
                   <div>
@@ -223,7 +223,7 @@ export default function EditBlogPage() {
                       id="tags" 
                       value={tags} 
                       onChange={(e) => setTags(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
                     />
                   </div>
                   <div>
@@ -233,7 +233,7 @@ export default function EditBlogPage() {
                       type="text" 
                       value={date} 
                       onChange={(e) => setDate(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
                       required 
                     />
                   </div>
@@ -251,19 +251,19 @@ export default function EditBlogPage() {
                         value={section.title} 
                         onChange={(e) => handleSectionChange(section.id, 'title', e.target.value)} 
                         placeholder="Section Title (optional)" 
-                        className="bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                        className="bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
                       />
                       <Input 
                         value={section.subtitle} 
                         onChange={(e) => handleSectionChange(section.id, 'subtitle', e.target.value)} 
                         placeholder="Section Subtitle (optional)" 
-                        className="bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                        className="bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
                       />
                       <Textarea 
                         value={section.body} 
                         onChange={(e) => handleSectionChange(section.id, 'body', e.target.value)} 
                         placeholder="Section body text..." 
-                        className="min-h-[120px] bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100" 
+                        className="min-h-[120px] bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100" 
                       />
                       
                       <div className="space-y-2">
@@ -290,7 +290,7 @@ export default function EditBlogPage() {
                         <Input 
                           type="file" 
                           onChange={(e) => handleSectionChange(section.id, 'image', e.target.files ? e.target.files[0] : null)} 
-                          className="bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                          className="bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
                         />
                       </div>
                     </div>
