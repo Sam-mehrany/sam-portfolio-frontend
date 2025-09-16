@@ -82,11 +82,11 @@ export default function AdminManageBlogPage() {
 
   return (
     <AuthGuard>
-      <main className="min-h-screen bg-slate-100">
+      <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-6 py-16">
           <header className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
+              <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </Link>
@@ -95,7 +95,7 @@ export default function AdminManageBlogPage() {
               </Button>
             </div>
             <div className="flex items-center justify-between">
-              <h1 className="text-4xl font-bold">Manage Blog Posts</h1>
+              <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Manage Blog Posts</h1>
               <Link href="/admin/blog/new">
                 <Button>
                   <PlusCircle className="h-4 w-4 mr-2" />
@@ -105,15 +105,15 @@ export default function AdminManageBlogPage() {
             </div>
           </header>
 
-          <Card>
+          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
             <CardContent className="pt-6">
-              {error && <p className="text-red-500 mb-4">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>}
               <div className="space-y-4">
                 {posts.length > 0 ? posts.map((post) => (
-                  <div key={post.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                  <div key={post.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600">
                     <div>
-                      <h3 className="font-semibold">{post.title}</h3>
-                      <p className="text-sm text-slate-500">{`/blog/${post.slug} • Published: ${post.date}`}</p>
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">{post.title}</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{`/blog/${post.slug} • Published: ${post.date}`}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Link href={`/admin/blog/edit/${post.id}`}>
@@ -122,7 +122,7 @@ export default function AdminManageBlogPage() {
                       <Button variant="destructive" size="sm" onClick={() => handleDelete(post.id)}>Delete</Button>
                     </div>
                   </div>
-                )) : <p className="text-slate-500">No blog posts found. Click "New Post" to get started.</p>}
+                )) : <p className="text-slate-500 dark:text-slate-400">No blog posts found. Click "New Post" to get started.</p>}
               </div>
             </CardContent>
           </Card>
@@ -131,10 +131,10 @@ export default function AdminManageBlogPage() {
       
       {/* Custom Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
           <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-slate-900 dark:text-slate-100">Are you sure?</DialogTitle>
+            <DialogDescription className="text-slate-600 dark:text-slate-400">
               This action cannot be undone. This will permanently delete the selected post.
             </DialogDescription>
           </DialogHeader>
