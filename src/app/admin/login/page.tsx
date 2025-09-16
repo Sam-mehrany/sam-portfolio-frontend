@@ -42,35 +42,37 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 flex items-center justify-center">
-      <Card className="w-full max-w-sm">
+    <main className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center transition-colors duration-300">
+      <Card className="w-full max-w-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
         <CardHeader>
-          <CardTitle>Admin Login</CardTitle>
-          <CardDescription>Enter your credentials to access the CMS.</CardDescription>
+          <CardTitle className="text-slate-900 dark:text-slate-100">Admin Login</CardTitle>
+          <CardDescription className="text-slate-600 dark:text-slate-400">Enter your credentials to access the CMS.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username" className="text-sm font-medium text-slate-900 dark:text-slate-100">Username</label>
               <Input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                 required
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password" className="text-sm font-medium text-slate-900 dark:text-slate-100">Password</label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                 required
               />
             </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && <p className="text-sm text-red-500 dark:text-red-400">{error}</p>}
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
