@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ArrowLeft, LogOut, PlusCircle, Trash2, X } from "lucide-react";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface Post {
   id: number;
@@ -82,7 +83,7 @@ export default function AdminManageBlogPage() {
 
   return (
     <AuthGuard>
-      <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
         <div className="max-w-4xl mx-auto px-6 py-16">
           <header className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -90,9 +91,12 @@ export default function AdminManageBlogPage() {
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </Link>
-              <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
-                <LogOut className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Manage Blog Posts</h1>
@@ -107,10 +111,10 @@ export default function AdminManageBlogPage() {
 
           <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
             <CardContent className="pt-6">
-              {error && <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>}
+              {error && <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>}
               <div className="space-y-4">
                 {posts.length > 0 ? posts.map((post) => (
-                  <div key={post.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600">
+                  <div key={post.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
                     <div>
                       <h3 className="font-semibold text-slate-900 dark:text-slate-100">{post.title}</h3>
                       <p className="text-sm text-slate-500 dark:text-slate-400">{`/blog/${post.slug} • Published: ${post.date}`}</p>
