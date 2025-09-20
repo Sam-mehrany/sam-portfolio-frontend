@@ -9,6 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { LogOut, PlusCircle, Trash2, X } from "lucide-react";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { ThemeToggle } from "@/components/theme-toggle";
+
+// Backend URL for direct image access
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sam-portfolio-backend.liara.run';
 
 // Define the structure for a content section from the API
 interface APIContentSection {
@@ -164,19 +168,30 @@ export default function EditBlogPage() {
   };
 
   if (isLoading) {
-    return <AuthGuard><div className="text-center py-24">Loading post...</div></AuthGuard>;
+    return (
+      <AuthGuard>
+        <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+          <div className="text-center py-24">
+            <p className="text-slate-600 dark:text-slate-400">Loading post...</p>
+          </div>
+        </div>
+      </AuthGuard>
+    );
   }
 
   return (
     <AuthGuard>
-      <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
         <div className="max-w-3xl mx-auto px-6 py-16">
           <header className="mb-8">
             <div className="flex items-center justify-between">
               <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Edit Post</h1>
-              <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
-                <LogOut className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <Link href="/admin/blog" className="text-sm text-blue-500 dark:text-blue-400 hover:underline">
               ← Back to All Posts
@@ -189,51 +204,51 @@ export default function EditBlogPage() {
                 <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
                   <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Post Details</h3>
                   <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Post Title</label>
+                    <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Post Title</label>
                     <Input 
                       id="title" 
                       value={title} 
                       onChange={(e) => setTitle(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       required 
                     />
                   </div>
                   <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300">URL Slug</label>
+                    <label htmlFor="slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300">URL Slug</label>
                     <Input 
                       id="slug" 
                       value={slug} 
                       onChange={(e) => setSlug(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       required 
                     />
                   </div>
                   <div>
-                    <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Excerpt</label>
+                    <label htmlFor="excerpt" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Excerpt</label>
                     <Textarea 
                       id="excerpt" 
                       value={excerpt} 
                       onChange={(e) => setExcerpt(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                     />
                   </div>
                   <div>
-                    <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags</label>
+                    <label htmlFor="tags" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Tags</label>
                     <Input 
                       id="tags" 
                       value={tags} 
                       onChange={(e) => setTags(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                     />
                   </div>
                   <div>
-                    <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+                    <label htmlFor="date" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Date</label>
                     <Input 
                       id="date" 
                       type="text" 
                       value={date} 
                       onChange={(e) => setDate(e.target.value)} 
-                      className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       required 
                     />
                   </div>
@@ -242,7 +257,7 @@ export default function EditBlogPage() {
                 <div className="p-4 border border-slate-200 dark:border-slate-600 rounded-lg space-y-4 bg-slate-50 dark:bg-slate-700/50">
                   <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Post Content</h3>
                   {sections.map((section, index) => (
-                    <div key={section.id} className="p-4 border border-slate-200 dark:border-slate-600 rounded-md relative space-y-3 bg-white dark:bg-slate-700">
+                    <div key={section.id} className="p-4 border border-slate-300 dark:border-slate-500 rounded-md relative space-y-3 bg-white dark:bg-slate-800">
                       <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-7 w-7" onClick={() => removeSection(section.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
@@ -251,29 +266,45 @@ export default function EditBlogPage() {
                         value={section.title} 
                         onChange={(e) => handleSectionChange(section.id, 'title', e.target.value)} 
                         placeholder="Section Title (optional)" 
-                        className="bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       />
                       <Input 
                         value={section.subtitle} 
                         onChange={(e) => handleSectionChange(section.id, 'subtitle', e.target.value)} 
                         placeholder="Section Subtitle (optional)" 
-                        className="bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       />
                       <Textarea 
                         value={section.body} 
                         onChange={(e) => handleSectionChange(section.id, 'body', e.target.value)} 
                         placeholder="Section body text..." 
-                        className="min-h-[120px] bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100" 
+                        className="min-h-[120px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
                       />
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Image</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Image</label>
                         <div className="relative w-full max-w-xs">
                           {section.image ? (
                             <img src={URL.createObjectURL(section.image)} alt="New preview" className="rounded-md w-full h-auto" />
                           ) : section.imageUrl ? (
-                            <img src={section.imageUrl} alt="Current image" className="rounded-md w-full h-auto" />
+                            <img 
+                              src={section.imageUrl.startsWith('http') ? section.imageUrl : `${backendUrl}${section.imageUrl}`} 
+                              alt="Current image" 
+                              className="rounded-md w-full h-auto"
+                              onError={(e) => {
+                                console.error('Section image failed to load:', section.imageUrl);
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                              onLoad={() => {
+                                console.log('Section image loaded successfully:', section.imageUrl);
+                              }}
+                            />
                           ) : null}
+                          
+                          <div className="hidden w-full h-full flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-700 absolute inset-0 rounded-md">
+                            Failed to Load
+                          </div>
                           
                           {(section.imageUrl || section.image) && (
                             <Button 
@@ -290,7 +321,7 @@ export default function EditBlogPage() {
                         <Input 
                           type="file" 
                           onChange={(e) => handleSectionChange(section.id, 'image', e.target.files ? e.target.files[0] : null)} 
-                          className="bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-slate-900 dark:text-slate-100"
+                          className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
                         />
                       </div>
                     </div>
@@ -305,7 +336,7 @@ export default function EditBlogPage() {
                   {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
                 </Button>
               </form>
-              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`}>{message}</p>}
+              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>{message}</p>}
             </CardContent>
           </Card>
         </div>
