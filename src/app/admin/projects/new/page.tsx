@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PlusCircle, Trash2, LogOut, X } from "lucide-react";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface ContentSection {
   id: number;
@@ -132,51 +133,86 @@ export default function NewProjectPage() {
 
   return (
     <AuthGuard>
-      <main className="min-h-screen bg-slate-100">
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
         <div className="max-w-3xl mx-auto px-6 py-16">
           <header className="mb-8">
             <div className="flex items-center justify-between">
-              <h1 className="text-4xl font-bold">Create New Project</h1>
-              <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
-                <LogOut className="h-4 w-4" />
-              </Button>
+              <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Create New Project</h1>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            <Link href="/admin/projects" className="text-sm text-blue-500 hover:underline">
+            <Link href="/admin/projects" className="text-sm text-blue-500 dark:text-blue-400 hover:underline">
               ← Back to All Projects
             </Link>
           </header>
-          <Card>
+          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 
-                <div className="space-y-4 p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Basic Information</h3>
+                <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Basic Information</h3>
                   <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700">Project Title</label>
-                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Ronix DE Homepage Redesign" required />
+                    <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Project Title</label>
+                    <Input 
+                      id="title" 
+                      value={title} 
+                      onChange={(e) => setTitle(e.target.value)} 
+                      placeholder="e.g., Ronix DE Homepage Redesign" 
+                      required 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                    />
                   </div>
                   <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700">URL Slug</label>
-                    <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g., ronix-de-redesign" required />
+                    <label htmlFor="slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300">URL Slug</label>
+                    <Input 
+                      id="slug" 
+                      value={slug} 
+                      onChange={(e) => setSlug(e.target.value)} 
+                      placeholder="e.g., ronix-de-redesign" 
+                      required 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                    />
                   </div>
                   <div>
-                    <label htmlFor="year" className="block text-sm font-medium text-gray-700">Year</label>
-                    <Input id="year" value={year} onChange={(e) => setYear(e.target.value)} placeholder="e.g., 2025" />
+                    <label htmlFor="year" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Year</label>
+                    <Input 
+                      id="year" 
+                      value={year} 
+                      onChange={(e) => setYear(e.target.value)} 
+                      placeholder="e.g., 2025" 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                    />
                   </div>
                   <div>
-                    <label htmlFor="blurb" className="block text-sm font-medium text-gray-700">Blurb</label>
-                    <Textarea id="blurb" value={blurb} onChange={(e) => setBlurb(e.target.value)} placeholder="A brief description for project cards..." />
+                    <label htmlFor="blurb" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Blurb</label>
+                    <Textarea 
+                      id="blurb" 
+                      value={blurb} 
+                      onChange={(e) => setBlurb(e.target.value)} 
+                      placeholder="A brief description for project cards..." 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                    />
                   </div>
                   <div>
-                    <label htmlFor="tags" className="block text-sm font-medium text-gray-700">Tags</label>
-                    <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="e.g., UX Design, Web Dev, AI" />
+                    <label htmlFor="tags" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Tags</label>
+                    <Input 
+                      id="tags" 
+                      value={tags} 
+                      onChange={(e) => setTags(e.target.value)} 
+                      placeholder="e.g., UX Design, Web Dev, AI" 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                    />
                   </div>
                 </div>
 
                 {/* ACTION: New Thumbnail Section */}
-                <div className="space-y-2 p-4 border rounded-lg">
-                    <label className="block text-lg font-semibold">Thumbnail Image</label>
-                    <p className="text-xs text-gray-500">This image will be shown on project listing pages. (Required)</p>
+                <div className="space-y-2 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                    <label className="block text-lg font-semibold text-slate-900 dark:text-slate-100">Thumbnail Image</label>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">This image will be shown on project listing pages. (Required)</p>
                     {thumbnail && (
                         <div className="relative w-full max-w-xs">
                             <img src={URL.createObjectURL(thumbnail)} alt="Thumbnail preview" className="rounded-md w-full h-auto" />
@@ -195,33 +231,73 @@ export default function NewProjectPage() {
                         type="file" 
                         onChange={(e) => setThumbnail(e.target.files ? e.target.files[0] : null)} 
                         required
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
                     />
                 </div>
 
-                <div className="space-y-4 p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Key Project Details</h3>
-                  <Textarea value={outcome} onChange={(e) => setOutcome(e.target.value)} placeholder="Key Outcome..." className="min-h-[100px]" />
-                  <Textarea value={challenge} onChange={(e) => setChallenge(e.target.value)} placeholder="The Challenge..." className="min-h-[120px]" />
-                  <Textarea value={solution} onChange={(e) => setSolution(e.target.value)} placeholder="The Solution..." className="min-h-[120px]" />
+                <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Key Project Details</h3>
+                  <Textarea 
+                    value={outcome} 
+                    onChange={(e) => setOutcome(e.target.value)} 
+                    placeholder="Key Outcome..." 
+                    className="min-h-[100px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
+                  />
+                  <Textarea 
+                    value={challenge} 
+                    onChange={(e) => setChallenge(e.target.value)} 
+                    placeholder="The Challenge..." 
+                    className="min-h-[120px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
+                  />
+                  <Textarea 
+                    value={solution} 
+                    onChange={(e) => setSolution(e.target.value)} 
+                    placeholder="The Solution..." 
+                    className="min-h-[120px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
+                  />
                 </div>
 
-                <div className="space-y-2 p-4 border rounded-lg">
-                  <label className="block text-lg font-semibold">Project Page Banner (Carousel)</label>
-                  <Input type="file" multiple onChange={(e) => setBannerImages(Array.from(e.target.files || []))} />
+                <div className="space-y-2 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <label className="block text-lg font-semibold text-slate-900 dark:text-slate-100">Project Page Banner (Carousel)</label>
+                  <Input 
+                    type="file" 
+                    multiple 
+                    onChange={(e) => setBannerImages(Array.from(e.target.files || []))} 
+                    className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                  />
                 </div>
                 
-                <div className="space-y-4 p-4 border rounded-lg">
-                  <h3 className="font-semibold text-lg">Additional Content Sections</h3>
+                <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Additional Content Sections</h3>
                   {sections.map((section, index) => (
-                    <div key={section.id} className="p-4 border rounded-md relative space-y-3">
+                    <div key={section.id} className="p-4 border border-slate-300 dark:border-slate-500 rounded-md relative space-y-3 bg-white dark:bg-slate-800">
                       <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-7 w-7" onClick={() => removeSection(section.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
-                      <h4 className="font-medium">Section {index + 1}</h4>
-                      <Input value={section.title} onChange={(e) => handleSectionChange(section.id, 'title', e.target.value)} placeholder="Section Title (e.g., Process)" />
-                      <Input value={section.subtitle} onChange={(e) => handleSectionChange(section.id, 'subtitle', e.target.value)} placeholder="Section Subtitle (optional)" />
-                      <Textarea value={section.body} onChange={(e) => handleSectionChange(section.id, 'body', e.target.value)} placeholder="Section body text..." className="min-h-[120px]" />
-                      <Input type="file" onChange={(e) => handleSectionChange(section.id, 'image', e.target.files ? e.target.files[0] : null)} />
+                      <h4 className="font-medium text-slate-900 dark:text-slate-100">Section {index + 1}</h4>
+                      <Input 
+                        value={section.title} 
+                        onChange={(e) => handleSectionChange(section.id, 'title', e.target.value)} 
+                        placeholder="Section Title (e.g., Process)" 
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                      />
+                      <Input 
+                        value={section.subtitle} 
+                        onChange={(e) => handleSectionChange(section.id, 'subtitle', e.target.value)} 
+                        placeholder="Section Subtitle (optional)" 
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                      />
+                      <Textarea 
+                        value={section.body} 
+                        onChange={(e) => handleSectionChange(section.id, 'body', e.target.value)} 
+                        placeholder="Section body text..." 
+                        className="min-h-[120px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
+                      />
+                      <Input 
+                        type="file" 
+                        onChange={(e) => handleSectionChange(section.id, 'image', e.target.files ? e.target.files[0] : null)} 
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                      />
                     </div>
                   ))}
                   <Button type="button" variant="outline" onClick={addSection}>
@@ -234,7 +310,7 @@ export default function NewProjectPage() {
                   {isSubmitting ? 'Creating Project...' : 'Create Project'}
                 </Button>
               </form>
-              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-500' : 'text-green-500'}`}>{message}</p>}
+              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>{message}</p>}
             </CardContent>
           </Card>
         </div>
