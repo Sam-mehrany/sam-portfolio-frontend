@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlusCircle, LogOut, ArrowLeft } from "lucide-react";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface Project {
   id: number;
@@ -78,22 +79,25 @@ export default function AdminProjectsPage() {
 
   return (
     <AuthGuard>
-      <main className="min-h-screen bg-slate-100">
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
         <div className="max-w-4xl mx-auto px-6 py-16">
           <header className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
+              <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </Link>
-              <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
-                <LogOut className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold">Manage Projects</h1>
-                <p className="text-slate-600">Create, edit, and delete your portfolio projects.</p>
+                <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Manage Projects</h1>
+                <p className="text-slate-600 dark:text-slate-400">Create, edit, and delete your portfolio projects.</p>
               </div>
               <Link href="/admin/projects/new">
                 <Button>
@@ -104,8 +108,8 @@ export default function AdminProjectsPage() {
             </div>
           </header>
 
-          {isLoading && <p>Loading projects...</p>}
-          {error && <p className="text-red-500 font-semibold p-4 bg-red-100 rounded-md">{error}</p>}
+          {isLoading && <p className="text-slate-600 dark:text-slate-400">Loading projects...</p>}
+          {error && <p className="text-red-600 dark:text-red-400 font-semibold p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">{error}</p>}
 
           <div className="space-y-4">
             {projects.map((project) => {
@@ -117,11 +121,11 @@ export default function AdminProjectsPage() {
                 : null;
 
               return (
-                <Card key={project.id}>
+                <Card key={project.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                   <CardContent className="p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-grow">
                       {thumbnailUrl ? (
-                        <div className="relative w-24 h-16 rounded-md overflow-hidden bg-slate-200">
+                        <div className="relative w-24 h-16 rounded-md overflow-hidden bg-slate-200 dark:bg-slate-700">
                           <img
                             src={thumbnailUrl}
                             alt={`${project.title} thumbnail`}
@@ -135,19 +139,19 @@ export default function AdminProjectsPage() {
                               console.log('Admin thumbnail loaded successfully:', thumbnailUrl);
                             }}
                           />
-                          <div className="hidden w-full h-full flex items-center justify-center text-xs text-slate-500 bg-slate-200 absolute inset-0">
+                          <div className="hidden w-full h-full flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-700 absolute inset-0">
                             Failed to Load
                           </div>
                         </div>
                       ) : (
-                        <div className="w-24 h-16 rounded-md bg-slate-200 flex items-center justify-center text-xs text-slate-500">
+                        <div className="w-24 h-16 rounded-md bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs text-slate-500 dark:text-slate-400">
                           No Image
                         </div>
                       )}
                       <div>
-                        <h3 className="font-semibold">{project.title}</h3>
-                        <p className="text-sm text-slate-500">/{project.slug}</p>
-                        {project.year && <p className="text-xs text-slate-400">{project.year}</p>}
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100">{project.title}</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">/{project.slug}</p>
+                        {project.year && <p className="text-xs text-slate-400 dark:text-slate-500">{project.year}</p>}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -166,7 +170,7 @@ export default function AdminProjectsPage() {
 
           {projects.length === 0 && !isLoading && !error && (
             <div className="text-center py-12">
-              <p className="text-slate-500 mb-4">No projects found. Create your first project!</p>
+              <p className="text-slate-500 dark:text-slate-400 mb-4">No projects found. Create your first project!</p>
               <Link href="/admin/projects/new">
                 <Button>
                   <PlusCircle className="h-4 w-4 mr-2" />
