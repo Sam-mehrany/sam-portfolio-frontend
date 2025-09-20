@@ -60,6 +60,9 @@ export default function AdminEditPage() {
     router.push('/admin/login');
   };
 
+  // Backend URL for direct image access
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sam-portfolio-backend.liara.run';
+
   useEffect(() => {
     if (id) {
       const fetchProject = async () => {
@@ -279,8 +282,24 @@ export default function AdminEditPage() {
                     {newThumbnail ? (
                       <img src={URL.createObjectURL(newThumbnail)} alt="New thumbnail preview" className="rounded-md w-full h-auto" />
                     ) : existingThumbnail ? (
-                      <img src={existingThumbnail} alt="Current thumbnail" className="rounded-md w-full h-auto" />
+                      <img 
+                        src={existingThumbnail.startsWith('http') ? existingThumbnail : `${backendUrl}${existingThumbnail}`} 
+                        alt="Current thumbnail" 
+                        className="rounded-md w-full h-auto"
+                        onError={(e) => {
+                          console.error('Thumbnail failed to load:', existingThumbnail);
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
+                        onLoad={() => {
+                          console.log('Thumbnail loaded successfully:', existingThumbnail);
+                        }}
+                      />
                     ) : null}
+                    
+                    <div className="hidden w-full h-full flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-700 absolute inset-0 rounded-md">
+                      Failed to Load
+                    </div>
                     
                     {(newThumbnail || existingThumbnail) && (
                       <Button 
@@ -326,14 +345,36 @@ export default function AdminEditPage() {
                 <div className="space-y-2 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
                   <label className="block text-lg font-semibold text-slate-900 dark:text-slate-100">Project Page Banner</label>
                   <div className="grid grid-cols-3 gap-4 mb-4">
-                    {(existingBannerImages || []).map(imgUrl => (
-                      <div key={imgUrl} className="relative">
-                        <img src={imgUrl} alt="Existing banner" className="rounded-md" />
-                        <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={() => handleRemoveExistingBannerImage(imgUrl)}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                    {(existingBannerImages || []).map(imgUrl => {
+                      // Construct proper image URL
+                      const fullImageUrl = imgUrl.startsWith('http') 
+                        ? imgUrl 
+                        : `${backendUrl}${imgUrl}`;
+                      
+                      return (
+                        <div key={imgUrl} className="relative">
+                          <img 
+                            src={fullImageUrl} 
+                            alt="Existing banner" 
+                            className="rounded-md w-full h-auto object-cover aspect-video"
+                            onError={(e) => {
+                              console.error('Banner image failed to load:', fullImageUrl);
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                            onLoad={() => {
+                              console.log('Banner image loaded successfully:', fullImageUrl);
+                            }}
+                          />
+                          <div className="hidden w-full h-full flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-700 absolute inset-0 rounded-md">
+                            Failed to Load
+                          </div>
+                          <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={() => handleRemoveExistingBannerImage(imgUrl)}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
                   </div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Add New Banner Images</label>
                   <Input 
@@ -377,8 +418,24 @@ export default function AdminEditPage() {
                           {section.image ? (
                             <img src={URL.createObjectURL(section.image)} alt="New preview" className="rounded-md w-full h-auto" />
                           ) : section.imageUrl ? (
-                            <img src={section.imageUrl} alt="Current image" className="rounded-md w-full h-auto" />
+                            <img 
+                              src={section.imageUrl.startsWith('http') ? section.imageUrl : `${backendUrl}${section.imageUrl}`} 
+                              alt="Current image" 
+                              className="rounded-md w-full h-auto"
+                              onError={(e) => {
+                                console.error('Section image failed to load:', section.imageUrl);
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                              onLoad={() => {
+                                console.log('Section image loaded successfully:', section.imageUrl);
+                              }}
+                            />
                           ) : null}
+                          
+                          <div className="hidden w-full h-full flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-700 absolute inset-0 rounded-md">
+                            Failed to Load
+                          </div>
                           
                           {(section.imageUrl || section.image) && (
                             <Button 
