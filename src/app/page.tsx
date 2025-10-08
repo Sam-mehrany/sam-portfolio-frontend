@@ -1,8 +1,6 @@
 "use client";
 
 import Link from 'next/link';
-// Remove Next.js Image import - we'll use regular img tags
-// import Image from 'next/image';
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +18,12 @@ import { Instagram, Linkedin, Mail } from "lucide-react";
 
 // Define types for our data to prevent errors
 interface HomePageContent {
-  hero: { availability: string; headline: string; skills: string; };
+  hero: { 
+    h1: string;  // ⭐ ADDED THIS
+    availability: string; 
+    headline: string; 
+    skills: string; 
+  };
   snapshot: { role: string; location: string; focus: string; socials: { instagram: string; linkedin: string; email: string; }; };
   work: { title: string; subtitle: string; selectedProjects: number[] };
 }
@@ -134,7 +137,10 @@ export default function Portfolio() {
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span className="text-slate-800 dark:text-slate-200">{content?.hero?.availability || 'Loading...'}</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Sam Mehrany</h1>
+            {/* ⭐ UPDATED: Dynamic H1 */}
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+              {content?.hero?.h1 || 'Sam Mehrany'}
+            </h1>
             <p className="mt-4 text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl">
               {content?.hero?.headline || 'Loading...'}
             </p>
