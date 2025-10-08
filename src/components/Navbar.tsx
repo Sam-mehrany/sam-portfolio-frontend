@@ -37,21 +37,12 @@ export default function Navbar() {
         return res.json();
       })
       .then((data: Settings) => {
-        setSiteName(data.site_name || 'Sam Mehrany');
-        setNavLinks(data.nav_links || []);
-        setIsLoading(false);
+        if (data.site_name) setSiteName(data.site_name);
+        if (data.nav_links && data.nav_links.length > 0) setNavLinks(data.nav_links);
       })
       .catch(err => {
         console.error('Failed to load settings:', err);
-        // Fallback to default values
-        setSiteName('Sam Mehrany');
-        setNavLinks([
-          { href: '/', label: 'Home' },
-          { href: '/about', label: 'About' },
-          { href: '/projects', label: 'Projects' },
-          { href: '/blog', label: 'Blog' },
-        ]);
-        setIsLoading(false);
+        // Keep using default values on error
       });
   }, []);
 
