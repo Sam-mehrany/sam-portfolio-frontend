@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from 'next/font/google';
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import DynamicTitle from "@/components/DynamicTitle"; // ⭐ ADD THIS
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} antialiased`}>
+        <DynamicTitle /> {/* ⭐ ADD THIS LINE */}
         <Navbar />
         {children}
       </body>
