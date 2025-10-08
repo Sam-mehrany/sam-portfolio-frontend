@@ -18,7 +18,12 @@ interface Experience { id: number; role: string; company: string; period: string
 interface Education { id: number; degree: string; university: string; }
 
 interface HomePageContent {
-  hero: { availability: string; headline: string; skills: string; };
+  hero: { 
+    h1: string;  // ⭐ ADDED THIS
+    availability: string; 
+    headline: string; 
+    skills: string; 
+  };
   snapshot: { role: string; location: string; focus: string; socials: { instagram: string; linkedin: string; email: string; }; };
   work: { title: string; subtitle: string; selectedProjects: number[] };
 }
@@ -209,7 +214,6 @@ export default function EditPage() {
   };
 
   const renderForm = () => {
-    // ✅ ADDED THIS LINE FOR DEBUGGING
     console.log("Rendering form with content:", content);
 
     if (typeof content !== 'object' || content === null) return <p className="text-slate-600 dark:text-slate-400">Loading form...</p>;
@@ -224,27 +228,64 @@ export default function EditPage() {
             placeholder="Page Title (internal use)" 
             className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
           />
+          
+          {/* ⭐ UPDATED HERO SECTION WITH H1 FIELD */}
           <div className="p-4 border border-slate-200 dark:border-slate-600 rounded-lg space-y-3 bg-slate-50 dark:bg-slate-700/50">
             <h3 className="font-semibold text-slate-900 dark:text-slate-100">Hero Section</h3>
-            <Input 
-              value={homeContent.hero?.availability || ''} 
-              onChange={(e) => handleContentChange('hero.availability', e.target.value)} 
-              placeholder="Availability Status" 
-              className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
-            />
-            <Textarea 
-              value={homeContent.hero?.headline || ''} 
-              onChange={(e) => handleContentChange('hero.headline', e.target.value)} 
-              placeholder="Headline" 
-              className="min-h-[100px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
-            />
-            <Textarea 
-              value={homeContent.hero?.skills || ''} 
-              onChange={(e) => handleContentChange('hero.skills', e.target.value)} 
-              placeholder="Skills (comma-separated)" 
-              className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
-            />
+            
+            {/* ⭐ NEW: H1 Input Field */}
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
+                Main Heading (H1)
+              </label>
+              <Input 
+                value={homeContent.hero?.h1 || ''} 
+                onChange={(e) => handleContentChange('hero.h1', e.target.value)} 
+                placeholder="Your Name or Main Heading" 
+                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+              />
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                This is the main heading displayed prominently on your homepage
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
+                Availability Status
+              </label>
+              <Input 
+                value={homeContent.hero?.availability || ''} 
+                onChange={(e) => handleContentChange('hero.availability', e.target.value)} 
+                placeholder="e.g., Open to collaborations" 
+                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
+                Headline
+              </label>
+              <Textarea 
+                value={homeContent.hero?.headline || ''} 
+                onChange={(e) => handleContentChange('hero.headline', e.target.value)} 
+                placeholder="Your professional tagline or description" 
+                className="min-h-[100px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
+                Skills (comma-separated)
+              </label>
+              <Textarea 
+                value={homeContent.hero?.skills || ''} 
+                onChange={(e) => handleContentChange('hero.skills', e.target.value)} 
+                placeholder="B2B Marketing, UX Writing, AI Video Production" 
+                className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+              />
+            </div>
           </div>
+
           <div className="p-4 border border-slate-200 dark:border-slate-600 rounded-lg space-y-3 bg-slate-50 dark:bg-slate-700/50">
             <h3 className="font-semibold text-slate-900 dark:text-slate-100">Snapshot Card</h3>
             <Input 
