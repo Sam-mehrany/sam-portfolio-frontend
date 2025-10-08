@@ -4,20 +4,56 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
+
+interface NavLink {
+  href: string;
+  label: string;
+}
+
+interface Settings {
+  site_name: string;
+  nav_links: NavLink[];
+}
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const navLinks = [
+  const [siteName, setSiteName] = useState('Sam Mehrany');
+  const [navLinks, setNavLinks] = useState<NavLink[]>([
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/projects', label: 'Projects' },
     { href: '/blog', label: 'Blog' },
-  ];
+  ]);
+
+  useEffect(() => {
+    // Fetch settings from the backend
+    fetch('/api/settings')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch settings');
+        return res.json();
+      })
+      .then((data: Settings) => {
+        setSiteName(data.site_name || 'Sam Mehrany');
+        setNavLinks(data.nav_links || []);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load settings:', err);
+        // Fallback to default values
+        setSiteName('Sam Mehrany');
+        setNavLinks([
+          { href: '/', label: 'Home' },
+          { href: '/about', label: 'About' },
+          { href: '/projects', label: 'Projects' },
+          { href: '/blog', label: 'Blog' },
+        ]);
+        setIsLoading(false);
+      });
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -33,7 +69,7 @@ export default function Navbar() {
         {/* Desktop and Mobile Header */}
         <div className="flex justify-between items-center">
           <Link href="/" className="text-xl font-bold tracking-tight" onClick={closeMobileMenu}>
-            Sam Mehrany
+            {siteName}
           </Link>
           
           {/* Desktop Navigation */}
@@ -44,7 +80,9 @@ export default function Navbar() {
                 href={link.href}
                 className={cn(
                   "text-muted-foreground transition-colors hover:text-foreground",
-                  (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))) && "text-foreground font-semibold"
+                  (pathname === link.href || 
+                   (link.href !== '/' && pathname.startsWith(link.href))) && 
+                  "text-foreground font-semibold"
                 )}
               >
                 {link.label}
@@ -87,7 +125,9 @@ export default function Navbar() {
                   href={link.href}
                   className={cn(
                     "text-muted-foreground transition-colors hover:text-foreground py-2 px-2 rounded-lg",
-                    (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))) && "text-foreground font-semibold bg-gray-50 dark:bg-gray-800"
+                    (pathname === link.href || 
+                     (link.href !== '/' && pathname.startsWith(link.href))) && 
+                    "text-foreground font-semibold bg-gray-50 dark:bg-gray-800"
                   )}
                   onClick={closeMobileMenu}
                 >
