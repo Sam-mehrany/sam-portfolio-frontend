@@ -1,0 +1,284 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { LogOut, PlusCircle, Trash2, X } from "lucide-react";
+import AuthGuard from "@/components/auth/AuthGuard";
+import { ThemeToggle } from "@/components/theme-toggle";
+
+// Define the structure for a content section
+interface ContentSection {
+  id: number;
+  title: string;
+  subtitle: string;
+  body: string;
+  image: File | null;
+  imageUrl?: string;
+}
+
+export default function NewBlogPage() {
+  const router = useRouter();
+
+  // State for post details
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [tags, setTags] = useState("");
+  const [date, setDate] = useState("");
+  
+  // State for dynamic content sections
+  const [sections, setSections] = useState<ContentSection[]>([]);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    // Set current date on initial load
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+    setDate(formattedDate);
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+    router.push('/admin/login');
+  };
+
+  // --- Section Management Handlers ---
+  const addSection = () => {
+    setSections([...sections, { id: Date.now(), title: "", subtitle: "", body: "", image: null }]);
+  };
+
+  const removeSection = (id: number) => {
+    setSections(sections.filter(section => section.id !== id));
+  };
+
+  const handleSectionChange = (id: number, field: keyof Omit<ContentSection, 'id'>, value: string | File | null) => {
+    setSections(sections.map(section => 
+      section.id === id ? { ...section, [field]: value } : section
+    ));
+  };
+
+  // ACTION: Add a handler to remove an image from a section
+  const handleRemoveImage = (id: number) => {
+    setSections(sections.map(section => 
+      section.id === id ? { ...section, imageUrl: '', image: null } : section
+    ));
+  };
+  
+  const uploadImages = async (files: File[]): Promise<string[]> => {
+    if (files.length === 0) return [];
+    const formData = new FormData();
+    files.forEach(file => formData.append('images', file));
+    const uploadResponse = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    });
+    if (!uploadResponse.ok) throw new Error('Image upload failed');
+    return (await uploadResponse.json()).paths;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage("Processing...");
+
+    try {
+      const finalSectionsData = await Promise.all(
+        sections.map(async (section) => {
+          let finalImageUrl = '';
+          if (section.image instanceof File) {
+            finalImageUrl = (await uploadImages([section.image]))[0];
+          }
+          return {
+            title: section.title,
+            subtitle: section.subtitle,
+            body: section.body,
+            imageUrl: finalImageUrl,
+          };
+        })
+      );
+      
+      const tagsArray = tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      const newPost = {
+        title, slug, excerpt, tags: tagsArray,
+        content: finalSectionsData,
+        date
+      };
+
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPost),
+        credentials: 'include'
+      });
+
+      if (!response.ok) throw new Error((await response.json()).error || 'Failed to create new post.');
+      
+      setMessage("Success! Post created. Redirecting...");
+      setTimeout(() => router.push('/admin/blog'), 1500);
+
+    } catch (error: unknown) { // FIX: Replaced 'any' with 'unknown'
+      if (error instanceof Error) {
+        setMessage(`Error: ${error.message}`);
+      } else {
+        setMessage("An unknown error occurred.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <AuthGuard>
+      <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="max-w-3xl mx-auto px-6 py-16">
+          <header className="mb-8">
+            <div className="flex items-center justify-between">
+              <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">New Post</h1>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button variant="outline" size="icon" onClick={handleLogout} aria-label="Logout">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <Link href="/admin/blog" className="text-sm text-blue-500 dark:text-blue-400 hover:underline">
+              ← Back to All Posts
+            </Link>
+          </header>
+          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <CardContent className="pt-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                
+                <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Post Details</h3>
+                  <div>
+                    <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Post Title</label>
+                    <Input 
+                      id="title" 
+                      value={title} 
+                      onChange={(e) => setTitle(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300">URL Slug</label>
+                    <Input 
+                      id="slug" 
+                      value={slug} 
+                      onChange={(e) => setSlug(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="excerpt" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Excerpt</label>
+                    <Textarea 
+                      id="excerpt" 
+                      value={excerpt} 
+                      onChange={(e) => setExcerpt(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="tags" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Tags</label>
+                    <Input 
+                      id="tags" 
+                      value={tags} 
+                      onChange={(e) => setTags(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="date" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Date</label>
+                    <Input 
+                      id="date" 
+                      type="text" 
+                      value={date} 
+                      onChange={(e) => setDate(e.target.value)} 
+                      className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="p-4 border border-slate-200 dark:border-slate-600 rounded-lg space-y-4 bg-slate-50 dark:bg-slate-700/50">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">Post Content</h3>
+                  {sections.map((section, index) => (
+                    <div key={section.id} className="p-4 border border-slate-300 dark:border-slate-500 rounded-md relative space-y-3 bg-white dark:bg-slate-800">
+                      <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-7 w-7" onClick={() => removeSection(section.id)}>
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                      <h4 className="font-medium text-slate-900 dark:text-slate-100">Section {index + 1}</h4>
+                      <Input 
+                        value={section.title} 
+                        onChange={(e) => handleSectionChange(section.id, 'title', e.target.value)} 
+                        placeholder="Section Title (optional)" 
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                      />
+                      <Input 
+                        value={section.subtitle} 
+                        onChange={(e) => handleSectionChange(section.id, 'subtitle', e.target.value)} 
+                        placeholder="Section Subtitle (optional)" 
+                        className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+                      />
+                      <Textarea 
+                        value={section.body} 
+                        onChange={(e) => handleSectionChange(section.id, 'body', e.target.value)} 
+                        placeholder="Section body text..." 
+                        className="min-h-[120px] bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400" 
+                      />
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Image</label>
+                        <div className="relative w-full max-w-xs">
+                          {section.image && (
+                            <img src={URL.createObjectURL(section.image)} alt="New preview" className="rounded-md w-full h-auto" />
+                          )}
+                          
+                          {(section.imageUrl || section.image) && (
+                            <Button 
+                                type="button" 
+                                variant="destructive" 
+                                size="icon" 
+                                className="absolute top-1 right-1 h-6 w-6"
+                                onClick={() => handleRemoveImage(section.id)}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                        <Input 
+                          type="file" 
+                          onChange={(e) => handleSectionChange(section.id, 'image', e.target.files ? e.target.files[0] : null)} 
+                          className="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" onClick={addSection}>
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Add Section
+                  </Button>
+                </div>
+
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Creating Post...' : 'Create Post'}
+                </Button>
+              </form>
+              {message && <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>{message}</p>}
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </AuthGuard>
+  );
+}
