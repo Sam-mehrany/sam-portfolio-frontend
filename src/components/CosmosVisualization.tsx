@@ -55,8 +55,9 @@ function WaveStars() {
 
       const x = (Math.random() - 0.5) * 100
       const z = (Math.random() - 0.5) * 100 - 30 // Push stars further back
-      const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 3 // Reduced from 8 to 3
-      const y = waveY + (Math.random() - 0.5) * 2 // Reduced from 5 to 2
+      // Calm horizontal wave confined to middle of view
+      const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 5 // Increased to 5 for more visible waves
+      const y = waveY + (Math.random() - 0.5) * 3 // Increased to 3 for more spread
 
       particles.positions[i3] = x
       particles.positions[i3 + 1] = y
@@ -76,8 +77,16 @@ function WaveStars() {
       particles.colors[i3 + 1] = color.g
       particles.colors[i3 + 2] = color.b
 
-      // Random sizes for variety
-      particles.sizes[i] = Math.random() * 0.15 + 0.05
+      // Random sizes for variety - match reference image with bigger variation
+      const sizeRandom = Math.random()
+      // Create some larger stars like in the reference image
+      if (sizeRandom > 0.95) {
+        particles.sizes[i] = Math.random() * 0.4 + 0.3 // Large stars (5% of stars)
+      } else if (sizeRandom > 0.85) {
+        particles.sizes[i] = Math.random() * 0.2 + 0.15 // Medium stars (10% of stars)
+      } else {
+        particles.sizes[i] = Math.random() * 0.1 + 0.05 // Small stars (85% of stars)
+      }
     }
 
     // Mouse move handler
@@ -113,11 +122,11 @@ function WaveStars() {
         const origY = particles.originalPositions[i3 + 1]
         const origZ = particles.originalPositions[i3 + 2]
 
-        // Base wave motion - reduced speed and amplitude
-        const wave1 = Math.sin(origX * 0.08 + time * 0.3) * Math.cos(origZ * 0.08 + time * 0.2) // Halved time multipliers
-        const wave2 = Math.sin(origX * 0.05 - time * 0.25) * Math.cos(origZ * 0.06 - time * 0.15) // Halved time multipliers
-        const wave3 = Math.sin(origX * 0.03 + origZ * 0.03 + time * 0.35) // Halved time multiplier
-        const combinedWave = (wave1 * 2 + wave2 * 1.5 + wave3 * 1) // Reduced amplitudes: 4→2, 3→1.5, 2→1
+        // Calm horizontal wave motion - flows gently through middle
+        const wave1 = Math.sin(origX * 0.08 + time * 0.3) * Math.cos(origZ * 0.08 + time * 0.2)
+        const wave2 = Math.sin(origX * 0.05 - time * 0.25) * Math.cos(origZ * 0.06 - time * 0.15)
+        const wave3 = Math.sin(origX * 0.03 + origZ * 0.03 + time * 0.35)
+        const combinedWave = (wave1 * 3 + wave2 * 2 + wave3 * 1.5) // Increased: 2→3, 1.5→2, 1→1.5
 
         // Calculate distance from mouse (in 2D space)
         const dx = positions[i3] - mouseX
@@ -145,9 +154,9 @@ function WaveStars() {
           mouseDisplacementZ = Math.sin(distance * 0.3 - time * 2) * pushStrength
         }
 
-        // Apply all effects - reduced vertical movement
+        // Apply all effects - calm wave in the middle
         positions[i3] = origX + mouseDisplacementX + particles.velocities[i3] * 50
-        positions[i3 + 1] = combinedWave + Math.sin(time * 0.25 + i * 0.001) * 1 + rippleEffect + mouseDisplacementY // Reduced: 0.5→0.25, 2→1
+        positions[i3 + 1] = combinedWave + Math.sin(time * 0.25 + i * 0.001) * 1.5 + rippleEffect + mouseDisplacementY // Increased to 1.5
         positions[i3 + 2] = origZ + mouseDisplacementZ + particles.velocities[i3 + 2] * 50
 
         // Subtle continuous drift
@@ -201,12 +210,18 @@ function WaveStars() {
           array={particles.colors}
           itemSize={3}
         />
+        <bufferAttribute
+          attach="attributes-size"
+          count={count}
+          array={particles.sizes}
+          itemSize={1}
+        />
       </bufferGeometry>
       <pointsMaterial
-        size={0.2}
+        size={0.3}
         vertexColors
         transparent
-        opacity={0.8}
+        opacity={0.9}
         sizeAttenuation={true}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
