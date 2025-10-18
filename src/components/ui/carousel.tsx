@@ -56,7 +56,6 @@ function Carousel({
       // Enforce smooth mouse dragging and non-looping content by default
       ...(opts || {}),
       axis: orientation === "horizontal" ? "x" : "y",
-      draggable: true,
       dragFree: true,
       containScroll: "trimSnaps",
       loop: false,
