@@ -77,15 +77,15 @@ function WaveStars() {
       particles.colors[i3 + 1] = color.g
       particles.colors[i3 + 2] = color.b
 
-      // Random sizes for variety - match reference image with bigger variation
+      // Random sizes for variety - increased size for better visibility
       const sizeRandom = Math.random()
       // Create some larger stars like in the reference image
       if (sizeRandom > 0.95) {
-        particles.sizes[i] = Math.random() * 0.4 + 0.3 // Large stars (5% of stars)
+        particles.sizes[i] = Math.random() * 0.5 + 0.4 // Large stars (5% of stars) - increased from 0.4+0.3
       } else if (sizeRandom > 0.85) {
-        particles.sizes[i] = Math.random() * 0.2 + 0.15 // Medium stars (10% of stars)
+        particles.sizes[i] = Math.random() * 0.3 + 0.2 // Medium stars (10% of stars) - increased from 0.2+0.15
       } else {
-        particles.sizes[i] = Math.random() * 0.1 + 0.05 // Small stars (85% of stars)
+        particles.sizes[i] = Math.random() * 0.15 + 0.08 // Small stars (85% of stars) - increased from 0.1+0.05
       }
     }
 
@@ -147,7 +147,7 @@ function WaveStars() {
         let mouseDisplacementY = 0
         let mouseDisplacementZ = 0
 
-        if (distance < maxDistance) {
+        if (distance < maxDistance && distance > 0.01) { // Prevent division by zero
           const pushStrength = (1 - distance / maxDistance) * 2
           mouseDisplacementX = (dx / distance) * pushStrength
           mouseDisplacementY = (dy / distance) * pushStrength
@@ -155,9 +155,14 @@ function WaveStars() {
         }
 
         // Apply all effects - calm wave with increased height
-        positions[i3] = origX + mouseDisplacementX + particles.velocities[i3] * 50
-        positions[i3 + 1] = combinedWave + Math.sin(time * 0.25 + i * 0.001) * 2.5 + rippleEffect + mouseDisplacementY // Increased to 2.5
-        positions[i3 + 2] = origZ + mouseDisplacementZ + particles.velocities[i3 + 2] * 50
+        const newX = origX + mouseDisplacementX + particles.velocities[i3] * 50
+        const newY = combinedWave + Math.sin(time * 0.25 + i * 0.001) * 2.5 + rippleEffect + mouseDisplacementY
+        const newZ = origZ + mouseDisplacementZ + particles.velocities[i3 + 2] * 50
+
+        // Prevent NaN values
+        positions[i3] = isNaN(newX) ? origX : newX
+        positions[i3 + 1] = isNaN(newY) ? origY : newY
+        positions[i3 + 2] = isNaN(newZ) ? origZ : newZ
 
         // Subtle continuous drift
         particles.velocities[i3] += (Math.random() - 0.5) * 0.0001
@@ -218,7 +223,7 @@ function WaveStars() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.3}
+        size={0.4}
         vertexColors
         transparent
         opacity={0.9}
