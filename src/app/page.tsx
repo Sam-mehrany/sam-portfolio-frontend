@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Instagram, Linkedin, Mail } from "lucide-react";
+import CosmosVisualization from "@/components/CosmosVisualization";
 
 // Define types for our data to prevent errors
 interface HomePageContent {
@@ -172,6 +173,11 @@ export default function Portfolio() {
           </div>
         </div>
       </header>
+
+      {/* Cosmos Visualization */}
+      <section className="w-full my-12">
+        <CosmosVisualization />
+      </section>
 
       {/* Projects */}
       <section id="projects" className="max-w-6xl mx-auto px-6 py-12">
