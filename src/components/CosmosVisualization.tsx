@@ -55,9 +55,9 @@ function WaveStars() {
 
       const x = (Math.random() - 0.5) * 100
       const z = (Math.random() - 0.5) * 100 - 30 // Push stars further back
-      // Calm horizontal wave confined to middle of view
-      const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 5 // Increased to 5 for more visible waves
-      const y = waveY + (Math.random() - 0.5) * 3 // Increased to 3 for more spread
+      // Calm horizontal wave with increased height
+      const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 8 // Increased to 8 for higher waves
+      const y = waveY + (Math.random() - 0.5) * 5 // Increased to 5 for more vertical spread
 
       particles.positions[i3] = x
       particles.positions[i3 + 1] = y
@@ -122,11 +122,11 @@ function WaveStars() {
         const origY = particles.originalPositions[i3 + 1]
         const origZ = particles.originalPositions[i3 + 2]
 
-        // Calm horizontal wave motion - flows gently through middle
+        // Calm horizontal wave motion with increased height
         const wave1 = Math.sin(origX * 0.08 + time * 0.3) * Math.cos(origZ * 0.08 + time * 0.2)
         const wave2 = Math.sin(origX * 0.05 - time * 0.25) * Math.cos(origZ * 0.06 - time * 0.15)
         const wave3 = Math.sin(origX * 0.03 + origZ * 0.03 + time * 0.35)
-        const combinedWave = (wave1 * 3 + wave2 * 2 + wave3 * 1.5) // Increased: 2→3, 1.5→2, 1→1.5
+        const combinedWave = (wave1 * 5 + wave2 * 3.5 + wave3 * 2.5) // Increased height: 3→5, 2→3.5, 1.5→2.5
 
         // Calculate distance from mouse (in 2D space)
         const dx = positions[i3] - mouseX
@@ -154,9 +154,9 @@ function WaveStars() {
           mouseDisplacementZ = Math.sin(distance * 0.3 - time * 2) * pushStrength
         }
 
-        // Apply all effects - calm wave in the middle
+        // Apply all effects - calm wave with increased height
         positions[i3] = origX + mouseDisplacementX + particles.velocities[i3] * 50
-        positions[i3 + 1] = combinedWave + Math.sin(time * 0.25 + i * 0.001) * 1.5 + rippleEffect + mouseDisplacementY // Increased to 1.5
+        positions[i3 + 1] = combinedWave + Math.sin(time * 0.25 + i * 0.001) * 2.5 + rippleEffect + mouseDisplacementY // Increased to 2.5
         positions[i3 + 2] = origZ + mouseDisplacementZ + particles.velocities[i3 + 2] * 50
 
         // Subtle continuous drift
