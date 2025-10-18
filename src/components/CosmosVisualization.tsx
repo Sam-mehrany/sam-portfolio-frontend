@@ -21,8 +21,22 @@ function WaveStars() {
   const { viewport } = useThree()
 
   useEffect(() => {
-    // Cosmic color palette
-    const cosmicColors = [
+    // Detect if we're in light mode
+    const isLightMode = !document.documentElement.classList.contains('dark')
+
+    // Cosmic color palette - darker colors for light mode
+    const cosmicColors = isLightMode ? [
+      new THREE.Color(0x555555), // Dark Gray
+      new THREE.Color(0x4a5568), // Slate Gray
+      new THREE.Color(0x2d3748), // Darker Gray
+      new THREE.Color(0x6b7280), // Medium Gray
+      new THREE.Color(0x4b5563), // Gray
+      new THREE.Color(0x374151), // Dark Slate
+      new THREE.Color(0x1f2937), // Very Dark Gray
+      new THREE.Color(0x111827), // Almost Black
+      new THREE.Color(0x3f3f46), // Zinc Gray
+      new THREE.Color(0x52525b), // Neutral Gray
+    ] : [
       new THREE.Color(0xffffff), // White
       new THREE.Color(0xadd8e6), // Light Blue
       new THREE.Color(0x87ceeb), // Sky Blue
@@ -41,8 +55,8 @@ function WaveStars() {
 
       const x = (Math.random() - 0.5) * 100
       const z = (Math.random() - 0.5) * 100 - 30 // Push stars further back
-      const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 8
-      const y = waveY + (Math.random() - 0.5) * 5
+      const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 3 // Reduced from 8 to 3
+      const y = waveY + (Math.random() - 0.5) * 2 // Reduced from 5 to 2
 
       particles.positions[i3] = x
       particles.positions[i3 + 1] = y
@@ -99,11 +113,11 @@ function WaveStars() {
         const origY = particles.originalPositions[i3 + 1]
         const origZ = particles.originalPositions[i3 + 2]
 
-        // Base wave motion
-        const wave1 = Math.sin(origX * 0.08 + time * 0.6) * Math.cos(origZ * 0.08 + time * 0.4)
-        const wave2 = Math.sin(origX * 0.05 - time * 0.5) * Math.cos(origZ * 0.06 - time * 0.3)
-        const wave3 = Math.sin(origX * 0.03 + origZ * 0.03 + time * 0.7)
-        const combinedWave = (wave1 * 4 + wave2 * 3 + wave3 * 2)
+        // Base wave motion - reduced speed and amplitude
+        const wave1 = Math.sin(origX * 0.08 + time * 0.3) * Math.cos(origZ * 0.08 + time * 0.2) // Halved time multipliers
+        const wave2 = Math.sin(origX * 0.05 - time * 0.25) * Math.cos(origZ * 0.06 - time * 0.15) // Halved time multipliers
+        const wave3 = Math.sin(origX * 0.03 + origZ * 0.03 + time * 0.35) // Halved time multiplier
+        const combinedWave = (wave1 * 2 + wave2 * 1.5 + wave3 * 1) // Reduced amplitudes: 4→2, 3→1.5, 2→1
 
         // Calculate distance from mouse (in 2D space)
         const dx = positions[i3] - mouseX
@@ -131,9 +145,9 @@ function WaveStars() {
           mouseDisplacementZ = Math.sin(distance * 0.3 - time * 2) * pushStrength
         }
 
-        // Apply all effects
+        // Apply all effects - reduced vertical movement
         positions[i3] = origX + mouseDisplacementX + particles.velocities[i3] * 50
-        positions[i3 + 1] = combinedWave + Math.sin(time * 0.5 + i * 0.001) * 2 + rippleEffect + mouseDisplacementY
+        positions[i3 + 1] = combinedWave + Math.sin(time * 0.25 + i * 0.001) * 1 + rippleEffect + mouseDisplacementY // Reduced: 0.5→0.25, 2→1
         positions[i3 + 2] = origZ + mouseDisplacementZ + particles.velocities[i3 + 2] * 50
 
         // Subtle continuous drift
@@ -146,7 +160,7 @@ function WaveStars() {
       }
 
       pointsRef.current.geometry.attributes.position.needsUpdate = true
-      pointsRef.current.rotation.y = time * 0.02
+      pointsRef.current.rotation.y = time * 0.01 // Halved rotation speed from 0.02 to 0.01
     }
   })
 
@@ -205,9 +219,26 @@ function WaveStars() {
 
 export default function CosmosVisualization() {
   const [mounted, setMounted] = useState(false)
+  const [bgColor, setBgColor] = useState('#000000')
 
   useEffect(() => {
     setMounted(true)
+
+    // Get the computed background color from CSS variables
+    const updateBgColor = () => {
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--background').trim()
+      // Convert oklch to hex approximation
+      const isLightMode = !document.documentElement.classList.contains('dark')
+      setBgColor(isLightMode ? '#ebebeb' : '#1f1f1f') // Light mode: oklch(0.92) ≈ #ebebeb, Dark: oklch(0.12) ≈ #1f1f1f
+    }
+
+    updateBgColor()
+
+    // Listen for theme changes
+    const observer = new MutationObserver(updateBgColor)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+
+    return () => observer.disconnect()
   }, [])
 
   if (!mounted) {
@@ -215,14 +246,14 @@ export default function CosmosVisualization() {
   }
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-background">
       <Canvas
         camera={{ position: [0, 5, 35], fov: 75 }}
         className="w-full h-full"
         gl={{ alpha: true, antialias: true }}
       >
-        <color attach="background" args={['#000000']} />
-        <fog attach="fog" args={['#000000', 30, 120]} />
+        <color attach="background" args={[bgColor]} />
+        <fog attach="fog" args={[bgColor, 30, 120]} />
         <ambientLight intensity={0.3} />
         <pointLight position={[0, 10, 10]} intensity={0.5} />
         <WaveStars />
