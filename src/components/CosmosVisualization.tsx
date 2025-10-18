@@ -24,7 +24,7 @@ function WaveStars() {
       const i3 = i * 3
 
       const x = (Math.random() - 0.5) * 100
-      const z = (Math.random() - 0.5) * 100
+      const z = (Math.random() - 0.5) * 100 - 30 // Push stars further back
       const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 8
       const y = waveY + (Math.random() - 0.5) * 5
 
@@ -162,19 +162,19 @@ export default function CosmosVisualization() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
       <Canvas
-        camera={{ position: [0, 5, 30], fov: 75 }}
+        camera={{ position: [0, 5, 35], fov: 75 }}
         className="w-full h-full"
         gl={{ alpha: true, antialias: true }}
       >
         <color attach="background" args={['#000000']} />
-        <fog attach="fog" args={['#000000', 20, 100]} />
+        <fog attach="fog" args={['#000000', 30, 120]} />
         <ambientLight intensity={0.3} />
         <pointLight position={[0, 10, 10]} intensity={0.5} />
         <WaveStars />
       </Canvas>
 
       {/* Gradient overlay for better content visibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/85 pointer-events-none" />
     </div>
   )
 }
