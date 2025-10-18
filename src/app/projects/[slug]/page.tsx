@@ -114,64 +114,69 @@ export default function SingleProjectPage() {
         {(project.images || []).length > 0 && (() => {
           // Check if all items are videos
           const allVideos = (project.images || []).every(src => /\.(mp4|webm|mov|avi|mkv)$/i.test(src));
-          const basisClass = allVideos ? "basis-full" : "basis-full md:basis-1/2 lg:basis-1/3";
+          const perPageCount = allVideos ? 1 : 3;
 
           return (
             <div className="w-full mb-12">
               <Carousel
                 className="w-full"
-                opts={{
-                  align: "start",
-                  loop: false,
-                  dragFree: true,
-                  duration: 20,
-                  skipSnaps: false
+                options={{
+                  type: 'slide',
+                  drag: 'free',
+                  perPage: perPageCount,
+                  perMove: 1,
+                  gap: '1rem',
+                  padding: 0,
+                  arrows: true,
+                  pagination: false,
+                  rewind: false,
+                  speed: 600,
+                  breakpoints: {
+                    1024: { perPage: allVideos ? 1 : 2 },
+                    640: { perPage: 1 },
+                  },
                 }}
               >
-                <CarouselContent className="-ml-4">
-                  {(project.images || []).map((mediaSrc, index) => {
-                    const fullMediaUrl = mediaSrc.startsWith('http')
-                      ? mediaSrc
-                      : `${backendUrl}${mediaSrc}`;
+                {(project.images || []).map((mediaSrc, index) => {
+                  const fullMediaUrl = mediaSrc.startsWith('http')
+                    ? mediaSrc
+                    : `${backendUrl}${mediaSrc}`;
 
-                    const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(mediaSrc);
+                  const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(mediaSrc);
 
-                    return (
-                      <CarouselItem key={index} className={`pl-4 ${basisClass}`}>
-                        {isVideo ? (
-                          <div className="cursor-pointer bg-muted rounded-lg overflow-hidden relative group" onClick={() => setLightboxVideo(fullMediaUrl)}>
-                            <video
-                              src={fullMediaUrl}
-                              className="w-full h-auto object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                              onError={(e) => {
-                                console.error('Banner video failed to load:', fullMediaUrl);
-                              }}
-                            />
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-all duration-300">
-                              <div className="bg-card/90 rounded-full p-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
-                                <Play className="h-8 w-8 fill-current" />
-                              </div>
+                  return (
+                    <CarouselItem key={index}>
+                      {isVideo ? (
+                        <div className="cursor-pointer bg-muted rounded-lg overflow-hidden relative group" onClick={() => setLightboxVideo(fullMediaUrl)}>
+                          <video
+                            src={fullMediaUrl}
+                            className="w-full h-auto object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                            onError={() => {
+                              console.error('Banner video failed to load:', fullMediaUrl);
+                            }}
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-all duration-300">
+                            <div className="bg-card/90 rounded-full p-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                              <Play className="h-8 w-8 fill-current" />
                             </div>
                           </div>
-                        ) : (
-                          <div className="cursor-pointer bg-muted rounded-lg overflow-hidden" onClick={() => setLightboxImage(fullMediaUrl)}>
-                            <img
-                              src={fullMediaUrl}
-                              alt={`Project image ${index + 1} for ${project.title}`}
-                              className="w-full h-auto object-cover rounded-lg hover:scale-105 transition-transform duration-300"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = '/placeholder-image.png';
-                              }}
-                            />
-                          </div>
-                        )}
-                      </CarouselItem>
-                    );
-                  })}
-                </CarouselContent>
-                <CarouselPrevious className="ml-16"/>
-                <CarouselNext className="mr-16"/>
+                        </div>
+                      ) : (
+                        <div className="cursor-pointer bg-muted rounded-lg overflow-hidden" onClick={() => setLightboxImage(fullMediaUrl)}>
+                          <img
+                            src={fullMediaUrl}
+                            alt={`Project image ${index + 1} for ${project.title}`}
+                            className="w-full h-auto object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = '/placeholder-image.png';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </CarouselItem>
+                  );
+                })}
               </Carousel>
             </div>
           );
