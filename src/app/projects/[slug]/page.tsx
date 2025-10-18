@@ -3,7 +3,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CheckCircle, Target, Wrench, X, Play } from "lucide-react";
+import { ArrowLeft, CheckCircle, Target, Wrench, X, Play, Eye } from "lucide-react";
 import Link from "next/link";
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from "react";
@@ -51,6 +51,7 @@ export default function SingleProjectPage() {
   const [error, setError] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [lightboxVideo, setLightboxVideo] = useState<string | null>(null);
+  const [views, setViews] = useState<number>(0);
 
   useEffect(() => {
     if (slug) {
@@ -60,6 +61,10 @@ export default function SingleProjectPage() {
           if (!response.ok) throw new Error('Could not find this project.');
           const data = await response.json();
           setProject(data);
+          setViews(data.views || 0);
+
+          // Track view
+          await fetch(`/api/views/project/${slug}`, { method: 'POST' });
         } catch (err: any) {
           setError(err.message);
         } finally {
@@ -101,12 +106,20 @@ export default function SingleProjectPage() {
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{project.title}</h1>
             <p className="text-lg text-muted-foreground mt-2">{project.blurb}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {(project.tags || []).map(tag => (
-                <Badge key={tag}>
-                  {tag}
-                </Badge>
-              ))}
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap gap-2">
+                {(project.tags || []).map(tag => (
+                  <Badge key={tag}>
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+              {views > 0 && (
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Eye className="h-4 w-4" />
+                  <span>{views.toLocaleString()} views</span>
+                </div>
+              )}
             </div>
           </header>
         </div>

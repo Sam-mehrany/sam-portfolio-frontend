@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Eye } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -44,10 +44,11 @@ async function getPost(slug: string): Promise<Post | null> {
 export default function SinglePostPage() {
   const params = useParams();
   const slug = params.slug as string;
-  
+
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [views, setViews] = useState<number>(0);
 
   useEffect(() => {
     if (slug) {
@@ -56,6 +57,10 @@ export default function SinglePostPage() {
           const data = await getPost(slug);
           if (data) {
             setPost(data);
+            setViews((data as any).views || 0);
+
+            // Track view
+            await fetch(`/api/views/post/${slug}`, { method: 'POST' });
           } else {
             setError('Post not found');
           }
@@ -104,9 +109,20 @@ export default function SinglePostPage() {
             Back to all posts
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">{post.title}</h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Published on {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+            <span>
+              Published on {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </span>
+            {views > 0 && (
+              <>
+                <span>•</span>
+                <div className="flex items-center gap-1">
+                  <Eye className="h-4 w-4" />
+                  <span>{views.toLocaleString()} views</span>
+                </div>
+              </>
+            )}
+          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {(post.tags || []).map((tag) => (
               <Badge key={tag}>{tag}</Badge>
