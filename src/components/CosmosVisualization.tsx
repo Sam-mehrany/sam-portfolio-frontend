@@ -1,29 +1,30 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
 function WaveStars() {
   const pointsRef = useRef<THREE.Points>(null)
-  const count = 15000 // Number of stars
+  const mousePos = useRef({ x: 0, y: 0 })
+  const targetMousePos = useRef({ x: 0, y: 0 })
+  const count = 15000
 
-  // Create wave-like distribution of stars
   const particles = useRef({
     positions: new Float32Array(count * 3),
     velocities: new Float32Array(count * 3),
+    originalPositions: new Float32Array(count * 3),
   }).current
 
+  const { viewport } = useThree()
+
   useEffect(() => {
-    // Initialize particles in wave formation
+    // Initialize particles
     for (let i = 0; i < count; i++) {
       const i3 = i * 3
 
-      // Spread across width and depth
-      const x = (Math.random() - 0.5) * 80
-      const z = (Math.random() - 0.5) * 80
-
-      // Create wave patterns
+      const x = (Math.random() - 0.5) * 100
+      const z = (Math.random() - 0.5) * 100
       const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 8
       const y = waveY + (Math.random() - 0.5) * 5
 
@@ -31,54 +32,96 @@ function WaveStars() {
       particles.positions[i3 + 1] = y
       particles.positions[i3 + 2] = z
 
-      // Random velocities for flowing effect
-      particles.velocities[i3] = (Math.random() - 0.5) * 0.02
-      particles.velocities[i3 + 1] = (Math.random() - 0.5) * 0.02
-      particles.velocities[i3 + 2] = (Math.random() - 0.5) * 0.02
+      particles.originalPositions[i3] = x
+      particles.originalPositions[i3 + 1] = y
+      particles.originalPositions[i3 + 2] = z
+
+      particles.velocities[i3] = (Math.random() - 0.5) * 0.01
+      particles.velocities[i3 + 1] = (Math.random() - 0.5) * 0.01
+      particles.velocities[i3 + 2] = (Math.random() - 0.5) * 0.01
     }
+
+    // Mouse move handler
+    const handleMouseMove = (event: MouseEvent) => {
+      targetMousePos.current = {
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -(event.clientY / window.innerHeight) * 2 + 1,
+      }
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
   useFrame((state) => {
     if (pointsRef.current) {
       const time = state.clock.getElapsedTime()
+
+      // Smooth mouse position interpolation
+      mousePos.current.x += (targetMousePos.current.x - mousePos.current.x) * 0.05
+      mousePos.current.y += (targetMousePos.current.y - mousePos.current.y) * 0.05
+
       const positions = pointsRef.current.geometry.attributes.position.array as Float32Array
+
+      // Convert mouse position to world coordinates
+      const mouseX = mousePos.current.x * viewport.width / 2
+      const mouseY = mousePos.current.y * viewport.height / 2
 
       for (let i = 0; i < count; i++) {
         const i3 = i * 3
 
-        const x = particles.positions[i3]
-        const z = particles.positions[i3 + 2]
+        const origX = particles.originalPositions[i3]
+        const origY = particles.originalPositions[i3 + 1]
+        const origZ = particles.originalPositions[i3 + 2]
 
-        // Create flowing wave motion
-        const wave1 = Math.sin(x * 0.08 + time * 0.6) * Math.cos(z * 0.08 + time * 0.4)
-        const wave2 = Math.sin(x * 0.05 - time * 0.5) * Math.cos(z * 0.06 - time * 0.3)
-        const wave3 = Math.sin(x * 0.03 + z * 0.03 + time * 0.7)
-
-        // Combine multiple wave frequencies
+        // Base wave motion
+        const wave1 = Math.sin(origX * 0.08 + time * 0.6) * Math.cos(origZ * 0.08 + time * 0.4)
+        const wave2 = Math.sin(origX * 0.05 - time * 0.5) * Math.cos(origZ * 0.06 - time * 0.3)
+        const wave3 = Math.sin(origX * 0.03 + origZ * 0.03 + time * 0.7)
         const combinedWave = (wave1 * 4 + wave2 * 3 + wave3 * 2)
 
-        // Update Y position with wave motion
-        positions[i3] = x
-        positions[i3 + 1] = combinedWave + Math.sin(time * 0.5 + i * 0.001) * 2
-        positions[i3 + 2] = z
+        // Calculate distance from mouse (in 2D space)
+        const dx = positions[i3] - mouseX
+        const dy = positions[i3 + 1] - mouseY
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const maxDistance = 15
 
-        // Subtle drift
-        particles.positions[i3] += particles.velocities[i3]
-        particles.positions[i3 + 2] += particles.velocities[i3 + 2]
+        // Create ripple effect when mouse is near
+        let rippleEffect = 0
+        if (distance < maxDistance) {
+          const rippleStrength = 1 - distance / maxDistance
+          const rippleWave = Math.sin(distance * 0.5 - time * 3) * rippleStrength
+          rippleEffect = rippleWave * 3
+        }
 
-        // Wrap around boundaries
-        if (Math.abs(particles.positions[i3]) > 40) {
-          particles.positions[i3] *= -1
+        // Mouse displacement effect (water-like push)
+        let mouseDisplacementX = 0
+        let mouseDisplacementY = 0
+        let mouseDisplacementZ = 0
+
+        if (distance < maxDistance) {
+          const pushStrength = (1 - distance / maxDistance) * 2
+          mouseDisplacementX = (dx / distance) * pushStrength
+          mouseDisplacementY = (dy / distance) * pushStrength
+          mouseDisplacementZ = Math.sin(distance * 0.3 - time * 2) * pushStrength
         }
-        if (Math.abs(particles.positions[i3 + 2]) > 40) {
-          particles.positions[i3 + 2] *= -1
-        }
+
+        // Apply all effects
+        positions[i3] = origX + mouseDisplacementX + particles.velocities[i3] * 50
+        positions[i3 + 1] = combinedWave + Math.sin(time * 0.5 + i * 0.001) * 2 + rippleEffect + mouseDisplacementY
+        positions[i3 + 2] = origZ + mouseDisplacementZ + particles.velocities[i3 + 2] * 50
+
+        // Subtle continuous drift
+        particles.velocities[i3] += (Math.random() - 0.5) * 0.0001
+        particles.velocities[i3 + 2] += (Math.random() - 0.5) * 0.0001
+
+        // Keep velocities small
+        particles.velocities[i3] = Math.max(-0.02, Math.min(0.02, particles.velocities[i3]))
+        particles.velocities[i3 + 2] = Math.max(-0.02, Math.min(0.02, particles.velocities[i3 + 2]))
       }
 
       pointsRef.current.geometry.attributes.position.needsUpdate = true
-
-      // Gentle rotation
-      pointsRef.current.rotation.y = time * 0.03
+      pointsRef.current.rotation.y = time * 0.02
     }
   })
 
@@ -105,7 +148,6 @@ function WaveStars() {
   )
 }
 
-
 export default function CosmosVisualization() {
   const [mounted, setMounted] = useState(false)
 
@@ -114,15 +156,11 @@ export default function CosmosVisualization() {
   }, [])
 
   if (!mounted) {
-    return (
-      <div className="w-full h-[400px] md:h-[600px] bg-gradient-to-b from-background via-slate-950/80 to-background flex items-center justify-center">
-        <div className="text-muted-foreground animate-pulse">Loading wave visualization...</div>
-      </div>
-    )
+    return null
   }
 
   return (
-    <div className="w-full h-[400px] md:h-[600px] relative overflow-hidden bg-gradient-to-b from-background via-slate-950/80 to-background">
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
       <Canvas
         camera={{ position: [0, 5, 30], fov: 75 }}
         className="w-full h-full"
@@ -130,27 +168,13 @@ export default function CosmosVisualization() {
       >
         <color attach="background" args={['#000000']} />
         <fog attach="fog" args={['#000000', 20, 100]} />
-
         <ambientLight intensity={0.3} />
         <pointLight position={[0, 10, 10]} intensity={0.5} />
-
         <WaveStars />
       </Canvas>
 
-      {/* Overlay gradient for better text visibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/30 pointer-events-none" />
-
-      {/* Centered text overlay */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="text-center px-6">
-          <h2 className="text-3xl md:text-5xl font-bold text-white/90 mb-3 tracking-tight">
-            Flowing Through Space
-          </h2>
-          <p className="text-sm md:text-lg text-white/60 max-w-2xl mx-auto">
-            Experience the cosmic waves • Thousands of stars in motion
-          </p>
-        </div>
-      </div>
+      {/* Gradient overlay for better content visibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80 pointer-events-none" />
     </div>
   )
 }

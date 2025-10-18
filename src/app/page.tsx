@@ -129,9 +129,12 @@ export default function Portfolio() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen relative text-foreground">
+      {/* Full-page Cosmos Background */}
+      <CosmosVisualization />
+
       {/* Hero */}
-      <header className="max-w-6xl mx-auto px-6 py-12">
+      <header className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         <div className="grid md:grid-cols-3 gap-8 items-center">
           <div className="md:col-span-2">
             <div className="inline-flex items-center gap-2 rounded-xl bg-secondary px-3 py-1 text-sm mb-4">
@@ -174,13 +177,8 @@ export default function Portfolio() {
         </div>
       </header>
 
-      {/* Cosmos Visualization */}
-      <section className="w-full my-12">
-        <CosmosVisualization />
-      </section>
-
       {/* Projects */}
-      <section id="projects" className="max-w-6xl mx-auto px-6 py-12">
+      <section id="projects" className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         <h2 className="text-2xl md:text-3xl font-semibold">{content?.work?.title || 'Selected Work'}</h2>
         <p className="text-muted-foreground mt-2">{content?.work?.subtitle}</p>
 
