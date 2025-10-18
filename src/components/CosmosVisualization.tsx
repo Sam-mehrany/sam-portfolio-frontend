@@ -2,109 +2,166 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Points, PointMaterial, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-interface Star {
-  x: number
-  y: number
-  z: number
-  magnitude: number
-  color: string
-  name: string
-}
-
-interface StarsData {
-  stars: Star[]
-}
-
-function WavyStars() {
+function WaveStars() {
   const pointsRef = useRef<THREE.Points>(null)
-  const [starData, setStarData] = useState<Star[]>([])
+  const count = 15000 // Number of stars
+
+  // Create wave-like distribution of stars
+  const particles = useRef({
+    positions: new Float32Array(count * 3),
+    velocities: new Float32Array(count * 3),
+  }).current
 
   useEffect(() => {
-    // Load star data from JSON
-    fetch('/data.json')
-      .then(res => res.json())
-      .then((data: StarsData) => {
-        setStarData(data.stars)
-      })
-      .catch(err => console.error('Error loading star data:', err))
+    // Initialize particles in wave formation
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3
+
+      // Spread across width and depth
+      const x = (Math.random() - 0.5) * 80
+      const z = (Math.random() - 0.5) * 80
+
+      // Create wave patterns
+      const waveY = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 8
+      const y = waveY + (Math.random() - 0.5) * 5
+
+      particles.positions[i3] = x
+      particles.positions[i3 + 1] = y
+      particles.positions[i3 + 2] = z
+
+      // Random velocities for flowing effect
+      particles.velocities[i3] = (Math.random() - 0.5) * 0.02
+      particles.velocities[i3 + 1] = (Math.random() - 0.5) * 0.02
+      particles.velocities[i3 + 2] = (Math.random() - 0.5) * 0.02
+    }
   }, [])
 
-  // Create positions array for stars
-  const positions = new Float32Array(starData.length * 3)
-  const colors = new Float32Array(starData.length * 3)
-  const sizes = new Float32Array(starData.length)
-
-  starData.forEach((star, i) => {
-    positions[i * 3] = star.x
-    positions[i * 3 + 1] = star.y
-    positions[i * 3 + 2] = star.z
-
-    // Convert hex color to RGB
-    const color = new THREE.Color(star.color)
-    colors[i * 3] = color.r
-    colors[i * 3 + 1] = color.g
-    colors[i * 3 + 2] = color.b
-
-    // Size based on magnitude (brighter stars are bigger)
-    sizes[i] = (3 - star.magnitude) * 0.05
-  })
-
-  // Animate with wavy motion
   useFrame((state) => {
     if (pointsRef.current) {
       const time = state.clock.getElapsedTime()
+      const positions = pointsRef.current.geometry.attributes.position.array as Float32Array
 
-      // Get position attribute
-      const positionAttribute = pointsRef.current.geometry.attributes.position
-      const positions = positionAttribute.array as Float32Array
-
-      // Apply wavy motion to each star
-      for (let i = 0; i < starData.length; i++) {
+      for (let i = 0; i < count; i++) {
         const i3 = i * 3
-        const originalX = starData[i].x
-        const originalY = starData[i].y
-        const originalZ = starData[i].z
 
-        // Create wavy effect with sine waves
-        const waveX = Math.sin(time * 0.5 + originalY * 0.3) * 0.3
-        const waveY = Math.sin(time * 0.3 + originalX * 0.5) * 0.3
-        const waveZ = Math.sin(time * 0.4 + originalX * 0.2 + originalY * 0.2) * 0.2
+        const x = particles.positions[i3]
+        const z = particles.positions[i3 + 2]
 
-        positions[i3] = originalX + waveX
-        positions[i3 + 1] = originalY + waveY
-        positions[i3 + 2] = originalZ + waveZ
+        // Create flowing wave motion
+        const wave1 = Math.sin(x * 0.08 + time * 0.6) * Math.cos(z * 0.08 + time * 0.4)
+        const wave2 = Math.sin(x * 0.05 - time * 0.5) * Math.cos(z * 0.06 - time * 0.3)
+        const wave3 = Math.sin(x * 0.03 + z * 0.03 + time * 0.7)
+
+        // Combine multiple wave frequencies
+        const combinedWave = (wave1 * 4 + wave2 * 3 + wave3 * 2)
+
+        // Update Y position with wave motion
+        positions[i3] = x
+        positions[i3 + 1] = combinedWave + Math.sin(time * 0.5 + i * 0.001) * 2
+        positions[i3 + 2] = z
+
+        // Subtle drift
+        particles.positions[i3] += particles.velocities[i3]
+        particles.positions[i3 + 2] += particles.velocities[i3 + 2]
+
+        // Wrap around boundaries
+        if (Math.abs(particles.positions[i3]) > 40) {
+          particles.positions[i3] *= -1
+        }
+        if (Math.abs(particles.positions[i3 + 2]) > 40) {
+          particles.positions[i3 + 2] *= -1
+        }
       }
 
-      positionAttribute.needsUpdate = true
+      pointsRef.current.geometry.attributes.position.needsUpdate = true
 
-      // Slow rotation of entire star field
-      pointsRef.current.rotation.y = time * 0.05
+      // Gentle rotation
+      pointsRef.current.rotation.y = time * 0.03
     }
   })
 
-  if (starData.length === 0) return null
-
   return (
-    <Points ref={pointsRef} positions={positions} stride={3}>
-      <PointMaterial
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={count}
+          array={particles.positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.08}
+        color="#ffffff"
         transparent
-        vertexColors
-        size={0.15}
+        opacity={0.6}
         sizeAttenuation={true}
         depthWrite={false}
-        opacity={0.8}
         blending={THREE.AdditiveBlending}
       />
-      <bufferAttribute
-        attach="geometry-attributes-color"
-        count={colors.length / 3}
-        array={colors}
-        itemSize={3}
-      />
-    </Points>
+    </points>
+  )
+}
+
+function WaveLines() {
+  const linesRef = useRef<THREE.Line[]>([])
+  const groupRef = useRef<THREE.Group>(null)
+  const lineCount = 30
+  const pointsPerLine = 100
+
+  useFrame((state) => {
+    const time = state.clock.getElapsedTime()
+
+    linesRef.current.forEach((line, lineIndex) => {
+      if (line) {
+        const positions = line.geometry.attributes.position.array as Float32Array
+
+        for (let i = 0; i < pointsPerLine; i++) {
+          const x = (i / pointsPerLine) * 80 - 40
+          const offset = lineIndex * 0.5 - 7.5
+
+          // Create flowing wave pattern
+          const y = Math.sin(x * 0.1 + time * 0.8 + lineIndex * 0.3) * 3 +
+                    Math.cos(x * 0.05 - time * 0.6) * 2 +
+                    offset
+
+          positions[i * 3] = x
+          positions[i * 3 + 1] = y
+          positions[i * 3 + 2] = -20
+        }
+
+        line.geometry.attributes.position.needsUpdate = true
+      }
+    })
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y = time * 0.02
+    }
+  })
+
+  return (
+    <group ref={groupRef}>
+      {Array.from({ length: lineCount }).map((_, i) => (
+        <line key={i} ref={(el) => { if (el) linesRef.current[i] = el }}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={pointsPerLine}
+              array={new Float32Array(pointsPerLine * 3)}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial
+            color="#888888"
+            transparent
+            opacity={0.15}
+            linewidth={1}
+          />
+        </line>
+      ))}
+    </group>
   )
 }
 
@@ -117,40 +174,40 @@ export default function CosmosVisualization() {
 
   if (!mounted) {
     return (
-      <div className="w-full h-[400px] md:h-[500px] bg-gradient-to-b from-background via-slate-950/50 to-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading cosmos...</div>
+      <div className="w-full h-[400px] md:h-[600px] bg-gradient-to-b from-background via-slate-950/80 to-background flex items-center justify-center">
+        <div className="text-muted-foreground animate-pulse">Loading wave visualization...</div>
       </div>
     )
   }
 
   return (
-    <div className="w-full h-[400px] md:h-[500px] relative overflow-hidden bg-gradient-to-b from-background via-slate-950/50 to-background">
+    <div className="w-full h-[400px] md:h-[600px] relative overflow-hidden bg-gradient-to-b from-background via-slate-950/80 to-background">
       <Canvas
-        camera={{ position: [0, 0, 8], fov: 60 }}
+        camera={{ position: [0, 5, 30], fov: 75 }}
         className="w-full h-full"
         gl={{ alpha: true, antialias: true }}
       >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <WavyStars />
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate
-          autoRotateSpeed={0.5}
-          maxPolarAngle={Math.PI / 1.5}
-          minPolarAngle={Math.PI / 3}
-        />
+        <color attach="background" args={['#000000']} />
+        <fog attach="fog" args={['#000000', 20, 100]} />
+
+        <ambientLight intensity={0.3} />
+        <pointLight position={[0, 10, 10]} intensity={0.5} />
+
+        <WaveStars />
+        <WaveLines />
       </Canvas>
 
-      {/* Overlay text */}
+      {/* Overlay gradient for better text visibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/30 pointer-events-none" />
+
+      {/* Centered text overlay */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center px-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-white/90 mb-2">
-            Explore the Cosmos
+          <h2 className="text-3xl md:text-5xl font-bold text-white/90 mb-3 tracking-tight">
+            Flowing Through Space
           </h2>
-          <p className="text-sm md:text-base text-white/70">
-            Interactive star field visualization • Drag to explore
+          <p className="text-sm md:text-lg text-white/60 max-w-2xl mx-auto">
+            Experience the cosmic waves • Thousands of stars in motion
           </p>
         </div>
       </div>
