@@ -14,11 +14,27 @@ function WaveStars() {
     positions: new Float32Array(count * 3),
     velocities: new Float32Array(count * 3),
     originalPositions: new Float32Array(count * 3),
+    colors: new Float32Array(count * 3),
+    sizes: new Float32Array(count),
   }).current
 
   const { viewport } = useThree()
 
   useEffect(() => {
+    // Cosmic color palette
+    const cosmicColors = [
+      new THREE.Color(0xffffff), // White
+      new THREE.Color(0xadd8e6), // Light Blue
+      new THREE.Color(0x87ceeb), // Sky Blue
+      new THREE.Color(0xffa07a), // Light Orange
+      new THREE.Color(0xffb6c1), // Light Pink
+      new THREE.Color(0xe6e6fa), // Lavender
+      new THREE.Color(0xffd700), // Gold
+      new THREE.Color(0xfff8dc), // Cornsilk
+      new THREE.Color(0xb0e0e6), // Powder Blue
+      new THREE.Color(0xffefd5), // Papaya Whip
+    ]
+
     // Initialize particles
     for (let i = 0; i < count; i++) {
       const i3 = i * 3
@@ -39,6 +55,15 @@ function WaveStars() {
       particles.velocities[i3] = (Math.random() - 0.5) * 0.01
       particles.velocities[i3 + 1] = (Math.random() - 0.5) * 0.01
       particles.velocities[i3 + 2] = (Math.random() - 0.5) * 0.01
+
+      // Assign random cosmic color
+      const color = cosmicColors[Math.floor(Math.random() * cosmicColors.length)]
+      particles.colors[i3] = color.r
+      particles.colors[i3 + 1] = color.g
+      particles.colors[i3 + 2] = color.b
+
+      // Random sizes for variety
+      particles.sizes[i] = Math.random() * 0.15 + 0.05
     }
 
     // Mouse move handler
@@ -125,6 +150,28 @@ function WaveStars() {
     }
   })
 
+  // Create circular texture for stars
+  const starTexture = useRef<THREE.Texture>()
+
+  useEffect(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 32
+    canvas.height = 32
+    const ctx = canvas.getContext('2d')!
+
+    // Create radial gradient for glow effect
+    const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16)
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)')
+    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)')
+    gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.4)')
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, 32, 32)
+
+    starTexture.current = new THREE.CanvasTexture(canvas)
+  }, [])
+
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
@@ -134,15 +181,23 @@ function WaveStars() {
           array={particles.positions}
           itemSize={3}
         />
+        <bufferAttribute
+          attach="attributes-color"
+          count={count}
+          array={particles.colors}
+          itemSize={3}
+        />
       </bufferGeometry>
       <pointsMaterial
-        size={0.08}
-        color="#ffffff"
+        size={0.2}
+        vertexColors
         transparent
-        opacity={0.6}
+        opacity={0.8}
         sizeAttenuation={true}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
+        map={starTexture.current}
+        alphaTest={0.01}
       />
     </points>
   )
