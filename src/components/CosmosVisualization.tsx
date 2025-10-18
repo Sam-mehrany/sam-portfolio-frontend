@@ -105,65 +105,6 @@ function WaveStars() {
   )
 }
 
-function WaveLines() {
-  const linesRef = useRef<THREE.Line[]>([])
-  const groupRef = useRef<THREE.Group>(null)
-  const lineCount = 30
-  const pointsPerLine = 100
-
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime()
-
-    linesRef.current.forEach((line, lineIndex) => {
-      if (line) {
-        const positions = line.geometry.attributes.position.array as Float32Array
-
-        for (let i = 0; i < pointsPerLine; i++) {
-          const x = (i / pointsPerLine) * 80 - 40
-          const offset = lineIndex * 0.5 - 7.5
-
-          // Create flowing wave pattern
-          const y = Math.sin(x * 0.1 + time * 0.8 + lineIndex * 0.3) * 3 +
-                    Math.cos(x * 0.05 - time * 0.6) * 2 +
-                    offset
-
-          positions[i * 3] = x
-          positions[i * 3 + 1] = y
-          positions[i * 3 + 2] = -20
-        }
-
-        line.geometry.attributes.position.needsUpdate = true
-      }
-    })
-
-    if (groupRef.current) {
-      groupRef.current.rotation.y = time * 0.02
-    }
-  })
-
-  return (
-    <group ref={groupRef}>
-      {Array.from({ length: lineCount }).map((_, i) => (
-        <line key={i} ref={(el) => { if (el) linesRef.current[i] = el }}>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={pointsPerLine}
-              array={new Float32Array(pointsPerLine * 3)}
-              itemSize={3}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial
-            color="#888888"
-            transparent
-            opacity={0.15}
-            linewidth={1}
-          />
-        </line>
-      ))}
-    </group>
-  )
-}
 
 export default function CosmosVisualization() {
   const [mounted, setMounted] = useState(false)
@@ -194,7 +135,6 @@ export default function CosmosVisualization() {
         <pointLight position={[0, 10, 10]} intensity={0.5} />
 
         <WaveStars />
-        <WaveLines />
       </Canvas>
 
       {/* Overlay gradient for better text visibility */}
